@@ -3,64 +3,36 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>数秘術 鑑定計算機</title>
+<title>数秘自動計算</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>
-/* Layout: 一列の縦長ページ。入力フォーム → 「基本の3つの数」(人物図＋3枚の札) → 名前・生年月日 → 詳細鑑定 */
+/* Layout: 黒いヘッダー → 星空の背景の上に「左：入力フォーム｜右：結果」→ 注意書きとボタン → 黒いフッター
+   結果は上から「基本となる3つの数（過去数・現在数・未来数）」→ Name / Birthday → 人物図と P・LP・S・M・D */
 :root {
-  --bg: #f3f4f7;
-  --surface: #ffffff;
-  --ink: #1f2338;
-  --muted: #5d6178;
-  --line: #dcdfe8;
-  --figure: #c9cde0;
-  --figure-deep: #a9afcb;
-  --c-life: #2f6f86;      /* ライフパス数 */
-  --c-destiny: #a8762b;   /* ディスティニー数 */
-  --c-soul: #b04f6a;      /* ソウル数 */
-  --on-badge: #ffffff;
-  --focus: #2f6f86;
-  --error: #b3261e;
-  --f-display: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --night: #000000;
+  --sky-1: #071a44;
+  --sky-2: #1b4c9c;
+  --sky-3: #24386f;
+  --sea-1: #142c58;
+  --sea-2: #3d5b8e;
+  --gold: #e7c36a;
+  --white: #ffffff;
+  --paper: rgba(234, 240, 250, 0.92);
+  --paper-solid: #eaf0fa;
+  --ink: #1d2a5c;
+  --ink-muted: #4c5a86;
+  --btn-1: #23306e;
+  --btn-2: #5b3d86;
+  --past: #e0245e;
+  --present: #f1df3c;
+  --future: #f0a12f;
+  --cta-1: #a6e6e3;
+  --cta-2: #f3d58f;
+  --f-title: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
   --f-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-  --f-num: "Cormorant Garamond", "Times New Roman", serif;
-  color-scheme: light;
-}
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) {
-    --bg: #161827;
-    --surface: #1f2235;
-    --ink: #e9eaf2;
-    --muted: #a3a7bf;
-    --line: #34384f;
-    --figure: #3b4060;
-    --figure-deep: #4b5176;
-    --c-life: #5fb3cc;
-    --c-destiny: #d9a557;
-    --c-soul: #e08aa2;
-    --on-badge: #161827;
-    --focus: #5fb3cc;
-    --error: #ff8a80;
-    color-scheme: dark;
-  }
-}
-:root[data-theme="dark"] {
-  --bg: #161827;
-  --surface: #1f2235;
-  --ink: #e9eaf2;
-  --muted: #a3a7bf;
-  --line: #34384f;
-  --figure: #3b4060;
-  --figure-deep: #4b5176;
-  --c-life: #5fb3cc;
-  --c-destiny: #d9a557;
-  --c-soul: #e08aa2;
-  --on-badge: #161827;
-  --focus: #5fb3cc;
-  --error: #ff8a80;
   color-scheme: dark;
 }
 
@@ -68,494 +40,603 @@
 html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--ink);
+  background: var(--night);
+  color: var(--white);
   font-family: var(--f-body);
-  font-size: 15px;
-  line-height: 1.8;
+  font-size: 14px;
+  line-height: 1.7;
 }
-.wrap {
-  max-width: 880px;
-  margin: 0 auto;
+.gutter {
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  padding-block: 40px 64px;
-  display: grid;
-  gap: 40px;
 }
+.inner { max-width: 1120px; margin: 0 auto; }
 
 /* ---------- header ---------- */
-header { display: grid; gap: 6px; }
-.eyebrow {
-  font-size: 12px;
-  letter-spacing: .18em;
-  color: var(--muted);
+.site-header { background: var(--night); padding-block: 18px; }
+.site-header .inner { display: flex; align-items: center; gap: 12px; }
+.logo { width: 44px; height: 44px; flex: none; }
+.site-name {
+  font-family: var(--f-title);
+  font-style: italic;
+  font-weight: 600;
+  color: var(--gold);
+  font-size: 17px;
+  letter-spacing: .04em;
   margin: 0;
 }
-h1 {
-  font-family: var(--f-display);
-  font-weight: 700;
-  font-size: clamp(26px, 5vw, 36px);
-  line-height: 1.35;
+
+/* ---------- hero (星空) ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(ellipse 60% 40% at 55% 30%, rgba(120, 170, 255, .35), transparent 70%),
+    radial-gradient(ellipse 40% 30% at 20% 60%, rgba(110, 90, 200, .25), transparent 70%),
+    linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 35%, var(--sky-3) 62%, var(--sea-1) 78%, var(--sea-2) 100%);
+  padding-block: 32px 56px;
+}
+#stars { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.hero .inner { position: relative; display: grid; gap: 28px; }
+
+.page-title { justify-self: end; text-align: right; display: grid; gap: 6px; }
+.page-title h1 {
   margin: 0;
+  font-family: var(--f-title);
+  font-style: italic;
+  font-weight: 800;
+  color: var(--gold);
+  font-size: clamp(24px, 3.4vw, 34px);
+  line-height: 1.25;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, .45);
   text-wrap: balance;
 }
-.lead { margin: 0; color: var(--muted); max-width: 60ch; }
+.page-title p { margin: 0; font-size: 12px; letter-spacing: .08em; }
 
-/* ---------- form ---------- */
-form {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 24px;
+.layout {
   display: grid;
-  gap: 20px;
+  grid-template-columns: 250px minmax(0, 1fr);
+  gap: 0;
+  align-items: start;
 }
-.field { display: grid; gap: 6px; min-width: 0; }
-.field > label, .field > .label {
-  font-weight: 700;
-  font-size: 14px;
+
+/* ---------- form (左) ---------- */
+.form-col {
+  padding-right: 22px;
+  border-right: 1px dashed rgba(255, 255, 255, .7);
+  display: grid;
+  gap: 22px;
+  align-content: start;
+  min-height: 100%;
 }
-.hint { font-size: 12.5px; color: var(--muted); margin: 0; }
-input[type="text"], select {
+form { display: grid; gap: 14px; }
+.f-label { font-size: 14px; font-weight: 500; display: block; margin-bottom: 6px; }
+.date-row { display: grid; grid-template-columns: 1.3fr 1fr 1fr; gap: 3px; }
+select, input[type="text"] {
   font: inherit;
-  color: var(--ink);
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 10px 12px;
+  font-size: 13px;
   width: 100%;
   min-width: 0;
-}
-input[type="text"] { letter-spacing: .06em; text-transform: uppercase; }
-input[type="text"]::placeholder { text-transform: none; letter-spacing: 0; color: var(--muted); }
-.date-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 8px; }
-.date-row label { display: grid; gap: 2px; font-size: 12px; color: var(--muted); }
-:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
-.error { color: var(--error); font-size: 13.5px; margin: 0; }
-.actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
-button {
-  font: inherit;
-  cursor: pointer;
-  border-radius: 999px;
-  border: 1px solid transparent;
-  padding: 11px 32px;
-  font-weight: 700;
-  letter-spacing: .1em;
-}
-.btn-primary { background: var(--ink); color: var(--bg); }
-.btn-primary:hover { opacity: .88; }
-.btn-ghost { background: transparent; color: var(--muted); border-color: var(--line); padding-inline: 20px; letter-spacing: .04em; font-weight: 500; }
-.btn-ghost:hover { color: var(--ink); }
-
-/* ---------- result ---------- */
-#result { display: grid; gap: 40px; scroll-margin-top: 16px; }
-.sample-note {
-  justify-self: start;
-  font-size: 12.5px;
-  color: var(--muted);
-  border: 1px dashed var(--line);
-  border-radius: 999px;
-  padding: 2px 12px;
-  margin: 0 0 -24px;
-}
-
-.core {
-  display: grid;
-  gap: 20px;
-}
-.core h2 {
-  font-family: var(--f-display);
-  font-size: clamp(22px, 4.2vw, 30px);
-  margin: 0;
-  text-align: center;
-  text-wrap: balance;
-}
-.core-body {
-  display: grid;
-  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
-  gap: 28px;
-  align-items: center;
-}
-.figure-box { display: grid; justify-items: center; }
-.figure-box svg { width: 100%; max-width: 260px; height: auto; display: block; }
-.fig-body { fill: var(--figure); }
-.fig-deep { fill: var(--figure-deep); }
-.fig-arm { stroke: var(--figure); fill: none; stroke-width: 15; stroke-linecap: round; }
-.fig-halo { fill: none; stroke: var(--c-destiny); stroke-width: 1.5; stroke-dasharray: 3 5; }
-.fig-heart-glow { fill: var(--c-soul); opacity: .18; }
-.fig-ground { fill: var(--c-life); opacity: .16; }
-.fig-path { fill: none; stroke: var(--c-life); stroke-width: 2; stroke-dasharray: 2 6; stroke-linecap: round; opacity: .7; }
-.fig-star { fill: var(--c-destiny); opacity: .55; }
-.badge-life { fill: var(--c-life); }
-.badge-destiny { fill: var(--c-destiny); }
-.badge-soul { fill: var(--c-soul); }
-.badge-num {
-  fill: var(--on-badge);
-  font-family: var(--f-num);
-  font-weight: 700;
-  font-size: 24px;
-  text-anchor: middle;
-  dominant-baseline: central;
-}
-
-.core-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
-.core-item {
-  display: grid;
-  grid-template-columns: 76px minmax(0, 1fr);
-  gap: 16px;
-  align-items: center;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 14px 18px;
-}
-.core-num {
-  font-family: var(--f-num);
-  font-weight: 700;
-  font-size: 54px;
-  line-height: 1;
-  text-align: center;
-  font-variant-numeric: lining-nums tabular-nums;
-}
-.core-item[data-k="life"] .core-num { color: var(--c-life); }
-.core-item[data-k="destiny"] .core-num { color: var(--c-destiny); }
-.core-item[data-k="soul"] .core-num { color: var(--c-soul); }
-.core-name { font-weight: 700; margin: 0; font-size: 15px; }
-.core-where { font-size: 12px; color: var(--muted); margin: 0; letter-spacing: .04em; }
-.core-key { margin: 2px 0 0; font-family: var(--f-display); font-size: 16px; }
-
-/* name / birthday */
-.person {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-block: 1px solid var(--line);
-}
-.person > div { padding: 14px 4px; display: grid; gap: 2px; min-width: 0; }
-.person > div + div { border-left: 1px solid var(--line); padding-left: 20px; }
-.person dt { font-size: 12px; color: var(--muted); letter-spacing: .12em; }
-.person dd { margin: 0; font-family: var(--f-display); font-size: clamp(18px, 3.4vw, 22px); font-weight: 700; overflow-wrap: anywhere; }
-
-/* letters table */
-.letters-wrap { overflow-x: auto; }
-.letters { display: flex; gap: 4px; flex-wrap: wrap; }
-.letter {
-  display: grid;
-  justify-items: center;
-  min-width: 26px;
-  padding: 4px 2px;
+  color: #222;
+  background: var(--white);
+  border: 1px solid #c9d1e4;
   border-radius: 6px;
-  font-variant-numeric: tabular-nums;
+  padding: 5px 8px;
+  color-scheme: light;
 }
-.letter b { font-family: var(--f-num); font-size: 18px; line-height: 1.1; font-weight: 600; }
-.letter span { font-size: 12px; color: var(--muted); }
-.letter.vowel { background: color-mix(in srgb, var(--c-soul) 14%, transparent); }
-.letter.space { min-width: 12px; }
-.legend { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
-.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: color-mix(in srgb, var(--c-soul) 30%, transparent); margin-right: 4px; vertical-align: -1px; }
-
-/* detail sections */
-.details { display: grid; gap: 20px; }
-.details > h2, .others h2 {
-  font-family: var(--f-display);
-  font-size: 22px;
+input[type="text"] { letter-spacing: .05em; padding: 6px 12px; }
+input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
+.notes { margin: 6px 0 0; font-size: 11px; line-height: 1.6; color: rgba(255, 255, 255, .85); }
+.notes p { margin: 0; }
+.error { color: #ffd1dc; background: rgba(160, 20, 60, .45); border-radius: 6px; padding: 6px 10px; font-size: 12.5px; margin: 0; }
+.submit {
+  justify-self: center;
+  font: inherit;
+  font-size: 16px;
+  letter-spacing: .12em;
+  color: var(--white);
+  background: linear-gradient(90deg, var(--btn-1), var(--btn-2));
+  border: 0;
+  border-radius: 999px;
+  padding: 7px 18px 7px 20px;
+  cursor: pointer;
+  margin-top: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
+}
+.submit:hover { filter: brightness(1.15); }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.privacy {
   margin: 0;
+  font-size: 11px;
+  font-style: italic;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, .85);
 }
-.detail {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  padding: 24px;
-  display: grid;
-  gap: 14px;
+
+/* ---------- result (右) ---------- */
+.result-col { padding-left: 10px; display: grid; gap: 34px; min-width: 0; }
+
+/* 基本となる3つの数 */
+.core { display: grid; gap: 14px; justify-items: center; scroll-margin-top: 12px; }
+.core-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 18px; }
+.core-head h2 {
+  margin: 0;
+  font-weight: 400;
+  font-size: 19px;
+  line-height: 1.45;
+  letter-spacing: .1em;
+  text-align: center;
 }
-.detail-head { display: flex; gap: 18px; align-items: center; }
-.detail-num {
-  flex: none;
-  width: 64px; height: 64px;
-  border-radius: 50%;
+.core-head h2 small { font-size: .74em; }
+.mini-row { display: flex; gap: 14px; }
+.mini {
+  width: 64px; height: 42px;
   display: grid; place-items: center;
-  font-family: var(--f-num);
-  font-size: 34px;
+  background: var(--paper-solid);
+  color: var(--ink);
+  border-radius: 4px;
+  border-bottom: 3px solid;
   font-weight: 700;
-  color: var(--on-badge);
-}
-.detail[data-k="life"] .detail-num { background: var(--c-life); }
-.detail[data-k="destiny"] .detail-num { background: var(--c-destiny); }
-.detail[data-k="soul"] .detail-num { background: var(--c-soul); }
-.detail-title { margin: 0; font-size: 17px; font-weight: 700; }
-.detail-sub { margin: 0; font-size: 13px; color: var(--muted); }
-.detail h4 { margin: 0; font-family: var(--f-display); font-size: 19px; }
-.detail p { margin: 0; max-width: 65ch; }
-.calc {
-  font-size: 13px;
-  color: var(--muted);
-  background: var(--bg);
-  border-radius: 8px;
-  padding: 8px 12px;
-  overflow-wrap: anywhere;
+  font-size: 16px;
   font-variant-numeric: tabular-nums;
 }
-.tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
-.tags li { font-size: 13px; border: 1px solid var(--line); border-radius: 999px; padding: 1px 12px; }
-.challenge { font-size: 14px; }
-.challenge strong { color: var(--muted); font-weight: 700; margin-right: 6px; }
-.master { font-size: 12px; font-weight: 700; color: var(--c-destiny); letter-spacing: .08em; }
-
-.others { display: grid; gap: 14px; }
-.others-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.other {
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  padding: 16px;
+.mini.past { border-color: var(--past); }
+.mini.present { border-color: var(--present); }
+.mini.future { border-color: var(--future); }
+.core-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 150px)); gap: 12px; justify-content: center; width: 100%; }
+.core-card {
+  background: var(--paper-solid);
+  color: var(--ink);
+  border: 2px solid;
+  border-radius: 9px;
+  padding: 10px 14px;
   display: grid;
   gap: 6px;
-  align-content: start;
-  background: var(--surface);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
 }
-.other .n { font-family: var(--f-num); font-size: 40px; font-weight: 700; line-height: 1; }
-.other h3 { margin: 0; font-size: 14.5px; }
-.other p { margin: 0; font-size: 13.5px; }
-.other .calc { font-size: 12px; padding: 4px 8px; }
+.core-card.past { border-color: var(--past); }
+.core-card.present { border-color: var(--present); }
+.core-card.future { border-color: var(--future); }
+.core-card .top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 16px; font-weight: 700; letter-spacing: .06em; }
+.core-card .top b { font-size: 18px; font-variant-numeric: tabular-nums; }
+.core-card .src { font-size: 15px; font-weight: 700; letter-spacing: .08em; }
 
-footer { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
-footer p { margin: 0 0 4px; }
+/* Name / Birthday */
+.who { display: grid; gap: 14px; max-width: 360px; }
+.who-row { display: grid; grid-template-columns: 70px minmax(0, 1fr); align-items: center; gap: 8px; }
+.who-row span { text-align: right; font-size: 14px; }
+.who-row output {
+  display: block;
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 6px 12px;
+  min-height: 34px;
+  font-size: 14px;
+  letter-spacing: .04em;
+  overflow-wrap: anywhere;
+}
+.who-row output:empty::before { content: attr(data-ph); color: var(--ink-muted); }
 
+/* 人物図と5つの数 */
+.chart {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 190px minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  grid-template-areas:
+    "p   fig lp"
+    ".   fig s"
+    "m   fig d";
+  column-gap: 14px;
+  row-gap: 26px;
+}
+.n-box { display: grid; gap: 6px; align-content: start; min-width: 0; position: relative; z-index: 1; }
+.n-box[data-k="P"]  { grid-area: p; margin-top: 60px; }
+.n-box[data-k="LP"] { grid-area: lp; }
+.n-box[data-k="S"]  { grid-area: s; }
+.n-box[data-k="M"]  { grid-area: m; }
+.n-box[data-k="D"]  { grid-area: d; }
+.n-tab { display: flex; align-items: center; gap: 10px; }
+.n-num {
+  width: 60px; height: 38px;
+  display: grid; place-items: center;
+  background: var(--paper-solid);
+  color: var(--ink);
+  border-radius: 4px;
+  border-bottom: 3px solid var(--paper-solid);
+  font-weight: 700;
+  font-size: 15px;
+  font-variant-numeric: tabular-nums;
+}
+.n-box.done .n-num { border-bottom-color: var(--future); }
+.n-name { font-size: 14px; font-weight: 500; letter-spacing: .04em; }
+.n-text {
+  background: var(--paper);
+  color: var(--ink);
+  border-radius: 4px;
+  padding: 10px 12px;
+  min-height: 118px;
+  font-size: 13px;
+  line-height: 1.75;
+  letter-spacing: .06em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
+}
+.n-text .ph { color: var(--ink-muted); font-size: 12px; }
+
+.fig { grid-area: fig; align-self: center; display: grid; justify-items: center; position: relative; z-index: 1; }
+.fig svg { width: 100%; max-width: 190px; height: auto; display: block; }
+#arrows { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 2; }
+#arrows line { stroke: rgba(255, 255, 255, .85); stroke-width: 2; }
+#arrows path { fill: rgba(255, 255, 255, .85); }
+
+/* ---------- 注意書き・ボタン ---------- */
+.after { position: relative; display: grid; gap: 34px; justify-items: center; padding-top: 30px; }
+.caution {
+  margin: 0;
+  max-width: 600px;
+  font-family: var(--f-title);
+  font-style: italic;
+  font-weight: 600;
+  font-size: 14.5px;
+  text-align: center;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
+}
+.cta-row { display: flex; flex-wrap: wrap; gap: 20px 64px; justify-content: center; }
+.cta {
+  display: inline-grid;
+  place-items: center;
+  min-width: 240px;
+  min-height: 60px;
+  padding: 8px 20px;
+  color: #333;
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  letter-spacing: .06em;
+  border: 2px solid rgba(255, 255, 255, .85);
+}
+.cta.learn { background: var(--cta-1); }
+.cta.session { background: var(--cta-2); }
+.cta:hover { filter: brightness(1.06); }
+
+/* ---------- footer ---------- */
+.site-footer { background: var(--night); padding-block: 40px; }
+.site-footer .inner { display: flex; justify-content: flex-end; }
+.site-footer p { margin: 0; font-family: var(--f-title); font-style: italic; font-size: 12px; letter-spacing: .1em; color: rgba(255, 255, 255, .85); }
+
+/* ---------- スマホ ---------- */
+@media (max-width: 860px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 30px; }
+  .form-col { padding-right: 0; border-right: 0; border-bottom: 1px dashed rgba(255, 255, 255, .7); padding-bottom: 26px; min-height: 0; }
+  .result-col { padding-left: 0; }
+  .page-title { justify-self: center; text-align: center; }
+}
 @media (max-width: 640px) {
-  .core-body { grid-template-columns: minmax(0, 1fr); }
-  .figure-box svg { max-width: 210px; }
-  .others-grid { grid-template-columns: minmax(0, 1fr); }
-  form, .detail { padding: 18px; }
-  .person { grid-template-columns: minmax(0, 1fr); }
-  .person > div + div { border-left: 0; border-top: 1px solid var(--line); padding-left: 4px; }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .reveal { animation: rise .5s ease-out both; }
-  @keyframes rise { from { transform: translateY(8px); opacity: .4; } to { transform: none; opacity: 1; } }
+  .chart {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas: "fig" "lp" "s" "d" "p" "m";
+    row-gap: 18px;
+  }
+  .n-box[data-k="P"] { margin-top: 0; }
+  .fig svg { max-width: 150px; }
+  #arrows { display: none; }
+  .n-text { min-height: 0; }
+  .core-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .core-card { padding: 8px; }
+  .core-card .top { font-size: 13.5px; flex-direction: column; gap: 0; align-items: flex-start; }
+  .core-card .src { font-size: 12px; letter-spacing: 0; }
+  .mini { width: 54px; }
+  .cta { min-width: 0; width: 100%; }
+  .cta-row { width: 100%; display: grid; gap: 14px; }
+  .site-footer .inner { justify-content: center; }
 }
 </style>
 </head>
 <body>
-<div class="wrap">
 
-  <header>
-    <p class="eyebrow">NUMEROLOGY CALCULATOR</p>
-    <h1>数秘術 鑑定計算機</h1>
-    <p class="lead">生年月日と、お名前のローマ字を入力して「鑑定する」を押してください。あなたの基本となる3つの数と、その意味を表示します。</p>
-  </header>
+<header class="site-header gutter">
+  <div class="inner">
+    <svg class="logo" viewBox="0 0 44 44" aria-hidden="true">
+      <circle cx="22" cy="22" r="19" fill="none" stroke="#e7c36a" stroke-width="1.2"/>
+      <path d="M22 7 L24.6 18.6 L36 22 L24.6 25.4 L22 37 L19.4 25.4 L8 22 L19.4 18.6 Z" fill="#e7c36a"/>
+      <circle cx="33" cy="11" r="1.6" fill="#e7c36a"/><circle cx="10" cy="33" r="1.2" fill="#e7c36a"/>
+    </svg>
+    <p class="site-name">Numerology - 数秘自動計算 -</p>
+  </div>
+</header>
 
-  <form id="form" novalidate>
-    <div class="field">
-      <label for="name">お名前（ローマ字）</label>
-      <input type="text" id="name" name="name" autocomplete="off" placeholder="例：TARO YAMADA" maxlength="60">
-      <p class="hint">パスポートと同じ表記がおすすめです。姓と名の間はスペースで区切ってください。</p>
+<main class="hero gutter">
+  <canvas id="stars" aria-hidden="true"></canvas>
+  <div class="inner">
+
+    <div class="page-title">
+      <h1>数秘自動計算</h1>
+      <p>生年月日と名前（ローマ字）から鑑定します</p>
     </div>
-    <div class="field">
-      <span class="label" id="birth-label">生年月日</span>
-      <div class="date-row" role="group" aria-labelledby="birth-label">
-        <label for="year">年<select id="year" name="year"></select></label>
-        <label for="month">月<select id="month" name="month"></select></label>
-        <label for="day">日<select id="day" name="day"></select></label>
+
+    <div class="layout">
+      <!-- 左：入力 -->
+      <div class="form-col">
+        <form id="form" novalidate>
+          <div>
+            <span class="f-label" id="birth-label">Birthday（生年月日）</span>
+            <div class="date-row" role="group" aria-labelledby="birth-label">
+              <select id="year" aria-label="年"></select>
+              <select id="month" aria-label="月"></select>
+              <select id="day" aria-label="日"></select>
+            </div>
+          </div>
+          <div>
+            <label class="f-label" for="name">Name（氏名）</label>
+            <input type="text" id="name" autocomplete="off" placeholder="ローマ字で入力" maxlength="60">
+            <div class="notes">
+              <p>※苗字と名前の順番は関係ありません。</p>
+              <p>※基本的に「ヘボン式ローマ字」を使います。</p>
+            </div>
+          </div>
+          <p class="error" id="error" role="alert" hidden></p>
+          <button type="submit" class="submit">鑑定する</button>
+        </form>
+        <p class="privacy">※入力された氏名と生年月日は、このページの中で数秘の計算にだけ使います。計算はお使いの端末の中で行われ、どこにも送信・保存されません。</p>
+      </div>
+
+      <!-- 右：結果 -->
+      <div class="result-col" aria-live="polite">
+
+        <section class="core" id="core" aria-labelledby="core-h">
+          <div class="core-head">
+            <h2 id="core-h">あなた<small>の</small>基本<small>となる</small>３<small>つの</small><br>魂<small>の</small>数字<small>は…</small></h2>
+            <div class="mini-row" aria-hidden="true">
+              <div class="mini past" id="mini-past"></div>
+              <div class="mini present" id="mini-present"></div>
+              <div class="mini future" id="mini-future"></div>
+            </div>
+          </div>
+          <div class="core-cards">
+            <div class="core-card past"><div class="top"><span>過去数</span><b id="v-past"></b></div><div class="src">生年月日の日</div></div>
+            <div class="core-card present"><div class="top"><span>現在数</span><b id="v-present"></b></div><div class="src">生年月日</div></div>
+            <div class="core-card future"><div class="top"><span>未来数</span><b id="v-future"></b></div><div class="src">生年月日の月日</div></div>
+          </div>
+        </section>
+
+        <div class="who">
+          <div class="who-row"><span>Name</span><output id="out-name" data-ph="Name"></output></div>
+          <div class="who-row"><span>Birthday</span><output id="out-birth" data-ph="Birthday"></output></div>
+        </div>
+
+        <div class="chart" id="chart">
+          <div class="n-box" data-k="LP"><div class="n-tab"><div class="n-num">LP</div><span class="n-name">LP (頭)</span></div><div class="n-text"></div></div>
+          <div class="n-box" data-k="S"><div class="n-tab"><div class="n-num">S</div><span class="n-name">S (心)</span></div><div class="n-text"></div></div>
+          <div class="n-box" data-k="D"><div class="n-tab"><div class="n-num">D</div><span class="n-name">D (体)</span></div><div class="n-text"></div></div>
+          <div class="n-box" data-k="P"><div class="n-tab"><div class="n-num">P</div><span class="n-name">P (見た目)</span></div><div class="n-text"></div></div>
+          <div class="n-box" data-k="M"><div class="n-tab"><div class="n-num">M</div><span class="n-name">M (将来)</span></div><div class="n-text"></div></div>
+
+          <div class="fig">
+            <!-- オリジナルの人物：星のブローチをつけた子ども -->
+            <svg viewBox="0 0 180 300" role="img" aria-label="人物の絵（頭＝LP、心＝S、体＝D）">
+              <!-- 足 -->
+              <rect x="70" y="240" width="16" height="34" rx="6" fill="#ffffff" stroke="#2a2a3a" stroke-width="2.5"/>
+              <rect x="94" y="240" width="16" height="34" rx="6" fill="#ffffff" stroke="#2a2a3a" stroke-width="2.5"/>
+              <path d="M62 276 Q62 266 78 268 L86 270 L86 282 L66 282 Q62 282 62 276 Z" fill="#3b4a8c" stroke="#2a2a3a" stroke-width="2.5"/>
+              <path d="M118 276 Q118 266 102 268 L94 270 L94 282 L114 282 Q118 282 118 276 Z" fill="#3b4a8c" stroke="#2a2a3a" stroke-width="2.5"/>
+              <!-- 腕 -->
+              <path d="M58 148 Q38 178 34 206" fill="none" stroke="#2a2a3a" stroke-width="15" stroke-linecap="round"/>
+              <path d="M58 148 Q38 178 34 206" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
+              <path d="M122 148 Q142 178 146 206" fill="none" stroke="#2a2a3a" stroke-width="15" stroke-linecap="round"/>
+              <path d="M122 148 Q142 178 146 206" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
+              <!-- 服（ケープつき） -->
+              <path d="M62 138 Q90 128 118 138 L132 246 Q90 258 48 246 Z" fill="#f6efd8" stroke="#2a2a3a" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M58 140 Q90 124 122 140 L126 166 Q90 182 54 166 Z" fill="#6f7fd0" stroke="#2a2a3a" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M48 246 Q90 258 132 246" fill="none" stroke="#6f7fd0" stroke-width="4"/>
+              <!-- 胸の星 -->
+              <path id="heart-star" d="M90 176 L95.3 188.7 L109 189.6 L98.5 198.4 L101.8 211.8 L90 204.5 L78.2 211.8 L81.5 198.4 L71 189.6 L84.7 188.7 Z" fill="#f2c94c" stroke="#2a2a3a" stroke-width="2" stroke-linejoin="round"/>
+              <!-- 頭 -->
+              <circle cx="90" cy="82" r="50" fill="#ffffff" stroke="#2a2a3a" stroke-width="2.5"/>
+              <!-- 髪（おだんご＋前髪） -->
+              <circle cx="90" cy="26" r="15" fill="#5a3a2a" stroke="#2a2a3a" stroke-width="2.5"/>
+              <path d="M40 84 Q38 34 90 32 Q142 34 140 84 Q130 60 112 56 Q100 68 80 62 Q62 58 50 70 Q44 76 40 84 Z" fill="#5a3a2a" stroke="#2a2a3a" stroke-width="2.5" stroke-linejoin="round"/>
+              <path d="M80 18 L84 24 M100 18 L96 24" stroke="#f2c94c" stroke-width="3" stroke-linecap="round"/>
+              <!-- 顔 -->
+              <path d="M64 92 Q71 84 78 92" fill="none" stroke="#2a2a3a" stroke-width="3" stroke-linecap="round"/>
+              <path d="M102 92 Q109 84 116 92" fill="none" stroke="#2a2a3a" stroke-width="3" stroke-linecap="round"/>
+              <ellipse cx="60" cy="104" rx="7" ry="4" fill="#f4a7b9" opacity=".8"/>
+              <ellipse cx="120" cy="104" rx="7" ry="4" fill="#f4a7b9" opacity=".8"/>
+              <path d="M82 106 Q90 114 98 106" fill="none" stroke="#2a2a3a" stroke-width="2.5" stroke-linecap="round"/>
+              <!-- 矢印の目標（見えない点） -->
+              <circle id="t-head" cx="90" cy="24" r="1" fill="none"/>
+              <circle id="t-heart" cx="98" cy="190" r="1" fill="none"/>
+              <circle id="t-body" cx="104" cy="250" r="1" fill="none"/>
+            </svg>
+          </div>
+          <svg id="arrows" aria-hidden="true">
+            <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z"/></marker></defs>
+            <line id="ar-LP" marker-end="url(#ah)"/>
+            <line id="ar-S" marker-end="url(#ah)"/>
+            <line id="ar-D" marker-end="url(#ah)"/>
+          </svg>
+        </div>
+
       </div>
     </div>
-    <p class="error" id="error" role="alert" hidden></p>
-    <div class="actions">
-      <button type="submit" class="btn-primary">鑑定する</button>
-      <button type="button" class="btn-ghost" id="reset">クリア</button>
+
+    <div class="after">
+      <p class="caution">※他の数字との組み合わせによって読み解き方は変わります。くわしい鑑定をご希望の方は、鑑定士によるセッションをおすすめします。</p>
+      <div class="cta-row">
+        <a class="cta learn" href="#">数秘を学ぶ</a>
+        <a class="cta session" href="#">セッションに申込む</a>
+      </div>
     </div>
-  </form>
+  </div>
+</main>
 
-  <section id="result" aria-live="polite"></section>
-
-  <footer>
-    <p>計算方法：ピタゴラス式（A=1, B=2 … I=9, J=1 … の表）。マスターナンバー 11・22・33 はそのまま残します。</p>
-    <p>ソウル数は母音（A・E・I・O・U）、パーソナリティ数は子音から計算します。Y は子音として扱います。</p>
-  </footer>
-</div>
+<footer class="site-footer gutter">
+  <div class="inner"><p>© 2026 Numerology - 数秘自動計算 -</p></div>
+</footer>
 
 <script>
 (function () {
   "use strict";
 
-  /* ===== 数の意味 ===== */
-  var MEANINGS = {
-    1: { key: "始まり・リーダーシップ", text: "自分の意志で道を切りひらく、パイオニアの数です。決断が早く、まだ誰もやっていないことに挑む勇気があります。人に合わせるより、自分が先頭に立つことで力を発揮します。", strengths: ["行動力", "独立心", "決断力"], challenge: "強さが頑固さに変わりやすいので、人の意見を聞く余裕を持つとさらに伸びます。" },
-    2: { key: "調和・協力", text: "人と人をつなぎ、場をやわらかく整える数です。相手の気持ちを細やかに感じ取り、サポート役として大きな力を発揮します。争いを好まず、穏やかな関係を大切にします。", strengths: ["共感力", "協調性", "気配り"], challenge: "相手を優先しすぎて自分の本音を飲み込みがちです。小さな「ノー」を言う練習を。" },
-    3: { key: "創造・表現・楽しさ", text: "明るさと遊び心で周りを楽しませる、表現の数です。話す・書く・描くなど、自分を表に出すことで輝きます。好奇心が強く、発想が豊かです。", strengths: ["表現力", "社交性", "ユーモア"], challenge: "興味が移りやすく、物事が中途半端になりがち。ひとつをやり遂げる経験が自信になります。" },
-    4: { key: "安定・誠実・努力", text: "コツコツと土台を築く、堅実な数です。約束を守り、計画どおりに物事を進める力があります。周りからの信頼が厚く、長く続く成果を生み出します。", strengths: ["忍耐力", "まじめさ", "計画性"], challenge: "変化を怖がりすぎると窮屈になります。ときには予定外の出来事を楽しんでみましょう。" },
-    5: { key: "自由・変化・冒険", text: "新しい経験を求めて動き続ける、自由の数です。適応力が高く、変化の多い環境ほど生き生きとします。五感が鋭く、人を惹きつける魅力があります。", strengths: ["適応力", "好奇心", "行動の速さ"], challenge: "刺激を求めて飽きっぽくなることも。自分で決めた軸をひとつ持つと安定します。" },
-    6: { key: "愛・責任・奉仕", text: "家族や仲間を大切にし、人の役に立つことに喜びを感じる数です。面倒見がよく、美しいものや心地よい空間をつくるセンスがあります。", strengths: ["思いやり", "責任感", "美的センス"], challenge: "世話を焼きすぎて相手の自立を妨げることも。自分自身を満たすことも忘れずに。" },
-    7: { key: "探究・分析・精神性", text: "物事の本質を深く知ろうとする、探究者の数です。一人の時間で考えを深め、専門的な分野で力を発揮します。直感と論理の両方を備えています。", strengths: ["分析力", "集中力", "洞察力"], challenge: "心の内を見せないため、誤解されることがあります。信頼できる人には気持ちを言葉にしてみて。" },
-    8: { key: "力・豊かさ・達成", text: "大きな目標を現実のものにする、実力の数です。経済感覚に優れ、組織を動かす統率力があります。努力が目に見える成果につながりやすい人です。", strengths: ["実行力", "統率力", "経済感覚"], challenge: "結果を求めるあまり、仕事中心になりがちです。人との温かいつながりが力の源になります。" },
-    9: { key: "博愛・完成・包容力", text: "広い視野と深い優しさを持つ、完成の数です。国や立場を越えて人を理解し、多くの人のために動けます。芸術的な感受性も豊かです。", strengths: ["包容力", "理想の高さ", "感受性"], challenge: "人の痛みを背負い込みやすい面があります。手放すこと、終わらせることも大切な力です。" },
-    11: { key: "直感・インスピレーション", text: "鋭い直感とひらめきを持つマスターナンバーです。目に見えないものを感じ取る力があり、人に気づきや希望を与える役割を持ちます。2の性質（調和・共感）もあわせ持ちます。", strengths: ["直感力", "感受性", "人を照らす力"], challenge: "感覚が鋭いぶん緊張しやすく、疲れやすい面も。心と体を休める時間を意識しましょう。" },
-    22: { key: "大きな構想を形にする", text: "大きな理想を現実の形にする力を持つマスターナンバーです。ビジョンと実務力を兼ね備え、社会に残る仕事を成し遂げる可能性があります。4の性質（堅実さ）もあわせ持ちます。", strengths: ["構想力", "実現力", "スケールの大きさ"], challenge: "背負う期待が大きく、プレッシャーを感じやすい数。一歩ずつ進めば大丈夫です。" },
-    33: { key: "無償の愛・癒し", text: "見返りを求めない大きな愛を表すマスターナンバーです。そこにいるだけで人を安心させ、癒やす力があります。6の性質（愛と責任）もあわせ持ちます。", strengths: ["慈愛", "癒しの力", "独創性"], challenge: "人に尽くしすぎて自分が空っぽになりがちです。受け取ることも愛のひとつです。" }
-  };
-
-  var TYPES = {
-    life:        { name: "ライフパス数", where: "生年月日から", about: "人生全体を通して歩む道と、大きなテーマを表します。" },
-    destiny:     { name: "ディスティニー数", where: "名前の全文字から", about: "生まれ持った才能と、社会の中で果たす役割を表します。" },
-    soul:        { name: "ソウル数", where: "名前の母音から", about: "心の奥にある本当の願い、あなたを動かす原動力を表します。" },
-    personality: { name: "パーソナリティ数", where: "名前の子音から", about: "周りの人から見たあなたの第一印象です。" },
-    birthday:    { name: "バースデー数", where: "生まれた日から", about: "日常の中で自然に発揮される特技です。" },
-    maturity:    { name: "マチュリティ数", where: "ライフパス数＋ディスティニー数", about: "人生の後半に花ひらく、成熟したテーマです。" }
+  /* ===== 各数の意味（キーワード） =====
+     P＝見た目、LP＝頭（性格・考え方）、D＝体（行動・役割）、M＝将来、S＝心（望み・好き嫌い） */
+  var TEXTS = {
+    P: {
+      1: "きりっとした印象・堂々としている・目力がある・自信がありそう・スポーティ・頼れるリーダー風・はっきりした物言い・シンプルで洗練された装い",
+      2: "やさしい雰囲気・物腰がやわらかい・控えめ・話しかけやすい・上品・清楚・聞き上手に見える・そばにいるとほっとする",
+      3: "明るく華やか・笑顔が印象的・若々しい・にぎやか・おしゃれ・人なつっこい・場を和ませる・キラキラしている",
+      4: "きちんとしている・まじめそう・誠実・清潔感・落ち着いた服装・信頼できそう・素朴・ぶれない安定感",
+      5: "個性的・エネルギッシュ・自由な雰囲気・色気がある・流行に敏感・フットワークが軽そう・刺激的・旅人のような空気",
+      6: "温かい・面倒見がよさそう・品がある・美意識が高い・ふんわり柔らか・家庭的・安心感・包み込むような笑顔",
+      7: "知的・クール・ミステリアス・近寄りがたい・凛としている・こだわりが強そう・ひとり時間が似合う・静かな存在感",
+      8: "貫禄がある・パワフル・成功者の雰囲気・華やかで豪華・頼もしい・堂々としている・ブランド感・存在感が大きい",
+      9: "おおらか・つかみどころがない・ふんわり・柔和・誰とでもなじむ・ナチュラル・懐が深そう・品のある大人",
+      11: "透明感・浮世離れした雰囲気・神秘的・繊細・独特のオーラ・純粋そう・はかなげ・自然と目を引く",
+      22: "スケールの大きさ・落ち着いた迫力・頼れる存在・凛としている・カリスマ性・器が大きい・ただ者ではない・堅実で華がある",
+      33: "天真爛漫・不思議な魅力・子どものような無邪気さ・独特の世界観・ほんわか・憎めない・唯一無二・ユニーク"
+    },
+    LP: {
+      1: "決断が早い・負けず嫌い・自立心が強い・直感で動く・前向き・せっかち・自分のやり方を貫く・開拓精神・正義感",
+      2: "協調性・気配り上手・相手を立てる・感受性が豊か・慎重・平和主義・繊細・サポート上手・迷いやすい面も",
+      3: "楽天的・好奇心旺盛・表現が得意・遊び心・ノリがいい・発想が豊か・飽きっぽい面も・子どものような素直さ・話し好き",
+      4: "計画的・堅実・努力家・責任感が強い・現実的・ルールを大切にする・粘り強い・慎重で保守的・コツコツ型",
+      5: "自由を愛する・変化に強い・行動派・多才・五感が鋭い・冒険心・束縛が苦手・頭の回転が速い・器用",
+      6: "愛情深い・責任感が強い・面倒見がいい・美意識が高い・正義感・世話好き・理想が高い・調和を重んじる・献身的",
+      7: "探究心・分析力・論理的・完璧主義・洞察が深い・ひとりの時間が大切・こだわりが強い・本質を見抜く・慎重",
+      8: "野心的・実行力・統率力・現実を動かす力・経済感覚・負けん気・パワフル・目標志向・器が大きい",
+      9: "寛容・理想主義・博愛・受容力・感受性が豊か・おおらか・人の気持ちに寄り添う・影響を受けやすい・芸術的センス",
+      11: "直感力・ひらめき・繊細な感性・精神世界への関心・理想が高い・緊張しやすい・純粋・二面性・人に気づきを与える",
+      22: "大きな構想力・現実にする力・バランス感覚・実務能力・使命感・高い理想と現実性・器が大きい・重圧に強い",
+      33: "無償の愛・独創的・宇宙的な視点・天才肌・感受性がとても強い・自由奔放・純粋・常識にとらわれない・人を癒す"
+    },
+    D: {
+      1: "先頭に立つ・自分で決めて動く・新しいことを始める・道を切りひらく・独立して働く・挑戦し続ける・前例をつくる",
+      2: "人と人をつなぐ・陰で支える・チームをまとめる・相手の話をよく聞く・調整役になる・二人三脚で進める・心を通わせる",
+      3: "楽しさを広める・言葉や作品で表現する・場を盛り上げる・アイディアを形にする・人を笑顔にする・発信する",
+      4: "土台をつくる・仕組みを整える・約束を守る・地道に積み上げる・手順を大切にする・安心できる環境をつくる",
+      5: "体験しながら学ぶ・あちこちへ動く・変化を起こす・新しい世界を紹介する・自由な働き方をする・情報を届ける",
+      6: "人のために尽くす・育てる・教える・美しい空間をつくる・家族や仲間を守る・ケアをする・責任を引き受ける",
+      7: "深く研究する・専門性を磨く・真実を探る・分析して伝える・ひとりで集中する・技術を極める・本物を追求する",
+      8: "成果を出す・組織を動かす・お金や資源を活かす・大きな目標を達成する・人を率いる・影響力を持つ",
+      9: "多くの人を受け入れる・世界に目を向ける・人を癒す・奉仕する・境界を越えてつなぐ・手放して次へ渡す",
+      11: "ひらめきを届ける・人の心に光をともす・見えないものを言葉にする・人と人の橋渡しをする・感性で導く",
+      22: "社会の仕組みをつくる・大きな事業を形にする・多くの人の役に立つ基盤を築く・夢を現実にする",
+      33: "愛を表現する・存在そのもので癒す・新しい価値観を示す・人の心をほどく・自由に創造する"
+    },
+    M: {
+      1: "自分の道を確立する・リーダーとして立つ・独立や起業・新しい分野を切りひらく・自分らしさを貫く",
+      2: "信頼できるパートナーシップ・穏やかな人間関係・人を支える喜び・調和のとれた暮らし・共感でつながる",
+      3: "人生を楽しむ・創作や表現を仕事にする・明るさで人を元気づける・好きなことで輝く・遊び心を取り戻す",
+      4: "安定した基盤を築く・心と暮らしが落ち着く・信頼を積み重ねる・長く続く仕組みを残す・安心感のある毎日",
+      5: "自由なライフスタイル・新しい土地や世界へ・多様な経験を活かす・変化を楽しむ・軽やかに生きる",
+      6: "愛のある家庭や居場所・人を育てる立場・美しいものに囲まれる・心と体のバランス・与える喜び",
+      7: "専門家として認められる・内面の成熟・探究の成果・精神的な豊かさ・静かで満ちた時間",
+      8: "物質的にも精神的にも豊かになる・社会的な成功・影響力を持つ・大きな仕事を任される・実りを受け取る",
+      9: "広い視野で人を助ける・世界とつながる・人生の集大成・無理なく手放せる・多くの人に慕われる",
+      11: "直感を信じて生きる・人に希望を届ける・心の道しるべになる・感性を活かす仕事・魂の目覚め",
+      22: "夢を大きな形にする・社会に残る仕事・多くの人の暮らしを支える・理想と現実をひとつにする",
+      33: "愛そのものを生きる・人を癒す存在になる・独自の世界観を表現する・自由と調和を両立する"
+    },
+    S: {
+      1: "一番になりたい・自分で決めたい・新しいことが好き・挑戦したい・認められたい・指図されるのは苦手・待つのが苦手",
+      2: "仲良くしたい・安心したい・誰かの役に立ちたい・争いは避けたい・わかり合いたい・ひとりは寂しい・やさしさに弱い",
+      3: "楽しく生きたい・おしゃべりが好き・注目されたい・ワクワクしたい・自由に表現したい・堅苦しいのは苦手",
+      4: "安心と安定が欲しい・計画どおりに進めたい・誠実でいたい・コツコツ続けたい・急な変更は苦手・いい加減は嫌い",
+      5: "自由でいたい・いろいろ体験したい・刺激が欲しい・変化を楽しみたい・縛られたくない・退屈は苦手",
+      6: "愛し愛されたい・人のお世話がしたい・美しいものが好き・家族や仲間を大切にしたい・頼られたい・不公平は嫌い",
+      7: "本質を知りたい・ひとりの時間が欲しい・納得してから動きたい・本物が好き・深く考えたい・うわべだけの関係は苦手",
+      8: "成功したい・豊かになりたい・目標を達成したい・実力を認められたい・力を発揮したい・中途半端は嫌い",
+      9: "人の役に立ちたい・みんなが幸せでいてほしい・理想を追いたい・おおらかでいたい・争いは苦手",
+      11: "直感に従いたい・純粋でいたい・美しい世界を見たい・人に光を届けたい・ありのままでいたい・嘘やごまかしは苦手",
+      22: "大きなことを成し遂げたい・社会の役に立ちたい・理想を現実にしたい・ゆるぎない基盤が欲しい・妥協は苦手",
+      33: "愛を分かち合いたい・自由に創造したい・人を笑顔にしたい・常識にとらわれたくない・心のままに生きたい"
+    }
   };
 
   /* ===== 計算 ===== */
+  // ピタゴラス式：A=1 … I=9, J=1 … R=9, S=1 … Z=8。母音は A E I O U（Y は子音）
   var VOWELS = "AEIOU";
   function letterValue(ch) { return ((ch.charCodeAt(0) - 65) % 9) + 1; }
   function digitSum(n) { return String(n).split("").reduce(function (a, d) { return a + Number(d); }, 0); }
   function isMaster(n) { return n === 11 || n === 22 || n === 33; }
-  // 1桁かマスターナンバーになるまで足し続け、途中経過も返す
-  function reduce(n, keepMaster) {
-    var steps = [n];
-    while (n > 9 && !(keepMaster && isMaster(n))) {
-      n = digitSum(n);
-      steps.push(n);
-    }
-    return { value: n, steps: steps };
-  }
-  function stepsText(steps) {
-    var out = [];
-    for (var i = 1; i < steps.length; i++) {
-      out.push(String(steps[i - 1]).split("").join("+") + "=" + steps[i]);
-    }
-    return out.length ? " → " + out.join(" → ") : "";
-  }
+  // 1桁か 11・22・33 になるまで各桁を足す
+  function reduce(n) { while (n > 9 && !isMaster(n)) n = digitSum(n); return n; }
+  function sumDigits(str) { return digitSum(str.replace(/\D/g, "")); }
 
   function normalizeName(raw) {
-    return (raw || "").normalize("NFKC").toUpperCase().replace(/[^A-Z ]+/g, " ").replace(/\s+/g, " ").trim();
+    return (raw || "").normalize("NFKC").toUpperCase().replace(/[^A-Z]+/g, " ").replace(/\s+/g, " ").trim();
   }
 
   function calc(name, y, m, d) {
-    var digits = (String(y) + String(m).padStart(2, "0") + String(d).padStart(2, "0")).split("").map(Number);
-    var lifeSum = digits.reduce(function (a, b) { return a + b; }, 0);
-    var life = reduce(lifeSum, true);
-
-    var letters = name.split("").map(function (ch) {
-      if (ch === " ") return { ch: ch, space: true };
-      return { ch: ch, v: letterValue(ch), vowel: VOWELS.indexOf(ch) >= 0 };
+    var letters = name.replace(/ /g, "").split("");
+    var all = 0, vowel = 0, cons = 0, hasVowel = false, hasCons = false;
+    letters.forEach(function (ch) {
+      var v = letterValue(ch);
+      all += v;
+      if (VOWELS.indexOf(ch) >= 0) { vowel += v; hasVowel = true; } else { cons += v; hasCons = true; }
     });
-    var real = letters.filter(function (l) { return !l.space; });
-    var sumOf = function (arr) { return arr.reduce(function (a, l) { return a + l.v; }, 0); };
-    var allSum = sumOf(real);
-    var vowelL = real.filter(function (l) { return l.vowel; });
-    var consL = real.filter(function (l) { return !l.vowel; });
-    var vowelSum = sumOf(vowelL), consSum = sumOf(consL);
-
-    var destiny = reduce(allSum, true);
-    var soul = reduce(vowelSum, true);
-    var personality = reduce(consSum, true);
-    var birthday = reduce(d, true);
-    var matSum = life.value + destiny.value;
-    var maturity = reduce(matSum, true);
-
+    var LP = reduce(sumDigits(String(y) + m + d));
+    var D = reduce(all);
     return {
-      letters: letters,
-      life: { value: life.value, calc: digits.join("+") + "=" + lifeSum + stepsText(life.steps) },
-      destiny: { value: destiny.value, calc: "全文字の合計 " + allSum + stepsText(destiny.steps) },
-      soul: { value: soul.value, calc: vowelL.length ? "母音 " + vowelL.map(function (l) { return l.ch + "(" + l.v + ")"; }).join("+") + "=" + vowelSum + stepsText(soul.steps) : "母音なし" },
-      personality: { value: personality.value, calc: "子音の合計 " + consSum + stepsText(personality.steps) },
-      birthday: { value: birthday.value, calc: d + "日" + stepsText(birthday.steps) },
-      maturity: { value: maturity.value, calc: life.value + "+" + destiny.value + "=" + matSum + stepsText(maturity.steps) }
+      LP: LP,
+      D: D,
+      S: hasVowel ? reduce(vowel) : null,
+      P: hasCons ? reduce(cons) : null,
+      M: reduce(LP + D),
+      past: reduce(d),
+      present: LP,
+      future: reduce(sumDigits(String(m) + d))
     };
   }
 
   /* ===== 表示 ===== */
-  function esc(s) {
-    return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; });
-  }
+  var LABEL = { LP: "LP", S: "S", D: "D", P: "P", M: "M" };
+  function setText(id, v) { document.getElementById(id).textContent = v; }
 
-  function figureSVG(r) {
-    // オリジナルの人物図：頭上の光輪＝ディスティニー数、胸＝ソウル数、足元の道＝ライフパス数
-    return '' +
-    '<svg viewBox="0 0 240 340" role="img" aria-label="人物図：頭上にディスティニー数 ' + r.destiny.value + '、胸にソウル数 ' + r.soul.value + '、足元にライフパス数 ' + r.life.value + '">' +
-      '<circle class="fig-star" cx="34" cy="58" r="2.5"/><circle class="fig-star" cx="206" cy="40" r="2"/>' +
-      '<circle class="fig-star" cx="198" cy="112" r="1.6"/><circle class="fig-star" cx="46" cy="134" r="1.6"/>' +
-      '<circle class="fig-star" cx="214" cy="190" r="2"/><circle class="fig-star" cx="24" cy="214" r="2"/>' +
-      '<ellipse class="fig-ground" cx="120" cy="284" rx="92" ry="13"/>' +
-      '<path class="fig-path" d="M120 290 C 120 304, 96 308, 88 318 S 92 336, 108 338"/>' +
-      '<circle class="fig-halo" cx="120" cy="66" r="44"/>' +
-      '<path class="fig-arm" d="M98 116 Q 70 150 58 198"/>' +
-      '<path class="fig-arm" d="M142 116 Q 170 150 182 198"/>' +
-      '<circle class="fig-deep" cx="57" cy="203" r="9"/><circle class="fig-deep" cx="183" cy="203" r="9"/>' +
-      '<path class="fig-body" d="M120 102 C 104 102 92 106 88 116 L 66 270 Q 120 290 174 270 L 152 116 C 148 106 136 102 120 102 Z"/>' +
-      '<rect class="fig-deep" x="112" y="92" width="16" height="14" rx="4"/>' +
-      '<circle class="fig-body" cx="120" cy="66" r="29"/>' +
-      '<circle class="fig-heart-glow" cx="120" cy="156" r="30"/>' +
-      '<circle class="badge-destiny" cx="120" cy="20" r="19"/><text class="badge-num" x="120" y="21">' + r.destiny.value + '</text>' +
-      '<circle class="badge-soul" cx="120" cy="156" r="19"/><text class="badge-num" x="120" y="157">' + r.soul.value + '</text>' +
-      '<circle class="badge-life" cx="120" cy="296" r="19"/><text class="badge-num" x="120" y="297">' + r.life.value + '</text>' +
-    '</svg>';
-  }
-
-  function coreItem(k, r) {
-    var t = TYPES[k], m = MEANINGS[r[k].value];
-    return '<li class="core-item" data-k="' + k + '">' +
-      '<div class="core-num">' + r[k].value + '</div>' +
-      '<div><p class="core-where">' + esc(t.where) + '</p><p class="core-name">' + esc(t.name) + '</p>' +
-      '<p class="core-key">' + esc(m.key) + '</p></div></li>';
-  }
-
-  function detail(k, r, extra) {
-    var t = TYPES[k], v = r[k].value, m = MEANINGS[v];
-    return '<article class="detail" data-k="' + k + '">' +
-      '<div class="detail-head"><div class="detail-num">' + v + '</div>' +
-      '<div><p class="detail-title">' + esc(t.name) + '　' + v + (isMaster(v) ? ' <span class="master">MASTER NUMBER</span>' : '') + '</p>' +
-      '<p class="detail-sub">' + esc(t.about) + '</p></div></div>' +
-      (extra || '') +
-      '<div class="calc">計算：' + esc(r[k].calc) + '</div>' +
-      '<h4>' + esc(m.key) + '</h4>' +
-      '<p>' + esc(m.text) + '</p>' +
-      '<ul class="tags">' + m.strengths.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>' +
-      '<p class="challenge"><strong>課題</strong>' + esc(m.challenge) + '</p>' +
-    '</article>';
-  }
-
-  function other(k, r) {
-    var t = TYPES[k], v = r[k].value, m = MEANINGS[v];
-    return '<div class="other"><div class="n">' + v + '</div><h3>' + esc(t.name) + '</h3>' +
-      '<p class="hint">' + esc(t.about) + '</p><p><strong>' + esc(m.key) + '</strong></p>' +
-      '<div class="calc">' + esc(r[k].calc) + '</div></div>';
-  }
-
-  function lettersHTML(r) {
-    return '<div class="letters-wrap"><div class="letters" aria-label="名前の各文字と数">' +
-      r.letters.map(function (l) {
-        if (l.space) return '<span class="letter space" aria-hidden="true"></span>';
-        return '<span class="letter' + (l.vowel ? ' vowel' : '') + '"><b>' + l.ch + '</b><span>' + l.v + '</span></span>';
-      }).join('') + '</div></div>' +
-      '<p class="legend"><i></i>色つきは母音（ソウル数に使用）</p>';
-  }
-
-  function render(name, y, m, d, isSample) {
+  function render(name, y, m, d) {
     var r = calc(name, y, m, d);
-    var el = document.getElementById("result");
-    el.innerHTML =
-      (isSample ? '<p class="sample-note">表示例：TARO YAMADA さん（1990年5月15日生まれ）の場合</p>' : '') +
-      '<section class="core reveal" aria-labelledby="core-h">' +
-        '<h2 id="core-h">あなたの基本となる3つの数は</h2>' +
-        '<div class="core-body">' +
-          '<div class="figure-box">' + figureSVG(r) + '</div>' +
-          '<ol class="core-list">' + coreItem("life", r) + coreItem("destiny", r) + coreItem("soul", r) + '</ol>' +
-        '</div>' +
-      '</section>' +
-      '<dl class="person reveal">' +
-        '<div><dt>お名前</dt><dd>' + esc(name) + '</dd></div>' +
-        '<div><dt>生年月日</dt><dd>' + y + '年' + m + '月' + d + '日</dd></div>' +
-      '</dl>' +
-      '<section class="details reveal" aria-labelledby="detail-h">' +
-        '<h2 id="detail-h">診断結果</h2>' +
-        detail("life", r) +
-        detail("destiny", r, lettersHTML(r)) +
-        detail("soul", r) +
-      '</section>' +
-      '<section class="others reveal" aria-labelledby="others-h">' +
-        '<h2 id="others-h">その他の数</h2>' +
-        '<div class="others-grid">' + other("personality", r) + other("birthday", r) + other("maturity", r) + '</div>' +
-      '</section>';
+    setText("out-name", name);
+    setText("out-birth", y + "/" + m + "/" + d);
+    setText("mini-past", r.past); setText("v-past", r.past);
+    setText("mini-present", r.present); setText("v-present", r.present);
+    setText("mini-future", r.future); setText("v-future", r.future);
+    document.querySelectorAll(".n-box").forEach(function (box) {
+      var k = box.dataset.k, v = r[k];
+      var num = box.querySelector(".n-num"), txt = box.querySelector(".n-text");
+      if (v === null) {
+        num.textContent = "-";
+        box.classList.remove("done");
+        txt.innerHTML = '<span class="ph">' + (k === "S" ? "名前に母音（A・E・I・O・U）がないため計算できません。" : "名前に子音がないため計算できません。") + "</span>";
+      } else {
+        num.textContent = v;
+        box.classList.add("done");
+        txt.textContent = TEXTS[k][v];
+      }
+    });
+    drawArrows();
   }
+
+  /* ===== 矢印（ボックス → 頭・心・体） ===== */
+  function drawArrows() {
+    var chart = document.getElementById("chart");
+    var svg = document.getElementById("arrows");
+    if (getComputedStyle(svg).display === "none") return;
+    var cr = chart.getBoundingClientRect();
+    [["LP", "t-head"], ["S", "t-heart"], ["D", "t-body"]].forEach(function (pair) {
+      var tab = chart.querySelector('.n-box[data-k="' + pair[0] + '"] .n-num').getBoundingClientRect();
+      var t = document.getElementById(pair[1]).getBoundingClientRect();
+      var line = document.getElementById("ar-" + pair[0]);
+      var x1 = tab.left - cr.left - 4, y1 = (pair[0] === "LP" ? tab.top : pair[0] === "D" ? tab.top : tab.top + tab.height / 2) - cr.top;
+      var x2 = t.left + t.width / 2 - cr.left, y2 = t.top + t.height / 2 - cr.top;
+      // 体にめり込まないよう、少し手前で止める
+      var dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1, cut = pair[0] === "S" ? 6 : 10;
+      line.setAttribute("x1", x1); line.setAttribute("y1", y1);
+      line.setAttribute("x2", x2 - dx / len * cut); line.setAttribute("y2", y2 - dy / len * cut);
+    });
+  }
+  window.addEventListener("resize", drawArrows);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawArrows);
+  window.addEventListener("load", drawArrows);
 
   /* ===== フォーム ===== */
   var form = document.getElementById("form");
@@ -563,50 +644,69 @@ footer p { margin: 0 0 4px; }
   var yEl = document.getElementById("year"), mEl = document.getElementById("month"), dEl = document.getElementById("day");
   var errEl = document.getElementById("error");
 
-  function opt(v, label) { var o = document.createElement("option"); o.value = v; o.textContent = label; return o; }
+  function opt(v) { var o = document.createElement("option"); o.value = v; o.textContent = v; return o; }
   var thisYear = new Date().getFullYear();
-  yEl.appendChild(opt("", "----"));
-  for (var yy = thisYear; yy >= 1900; yy--) yEl.appendChild(opt(yy, yy));
-  mEl.appendChild(opt("", "--"));
-  for (var mm = 1; mm <= 12; mm++) mEl.appendChild(opt(mm, mm));
-
+  for (var yy = 1900; yy <= thisYear; yy++) yEl.appendChild(opt(yy));
+  for (var mm = 1; mm <= 12; mm++) mEl.appendChild(opt(mm));
   function fillDays() {
-    var keep = dEl.value;
-    var y = Number(yEl.value) || 2000, m = Number(mEl.value) || 1;
-    var max = new Date(y, m, 0).getDate();
+    var keep = Number(dEl.value) || 1;
+    var max = new Date(Number(yEl.value), Number(mEl.value), 0).getDate();
     dEl.innerHTML = "";
-    dEl.appendChild(opt("", "--"));
-    for (var i = 1; i <= max; i++) dEl.appendChild(opt(i, i));
-    if (keep && Number(keep) <= max) dEl.value = keep;
+    for (var i = 1; i <= max; i++) dEl.appendChild(opt(i));
+    dEl.value = Math.min(keep, max);
   }
-  fillDays();
+  yEl.value = 1980; mEl.value = 1; fillDays();
   yEl.addEventListener("change", fillDays);
   mEl.addEventListener("change", fillDays);
-
-  function showError(msg) { errEl.textContent = msg; errEl.hidden = !msg; }
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var name = normalizeName(nameEl.value);
-    if (!name) { showError("お名前をローマ字（A〜Z）で入力してください。"); nameEl.focus(); return; }
-    if (!yEl.value || !mEl.value || !dEl.value) { showError("生年月日の年・月・日をすべて選んでください。"); return; }
-    showError("");
+    if (!name) {
+      errEl.textContent = "お名前をローマ字（A〜Z）で入力してください。";
+      errEl.hidden = false;
+      nameEl.focus();
+      return;
+    }
+    errEl.hidden = true;
     nameEl.value = name;
-    render(name, Number(yEl.value), Number(mEl.value), Number(dEl.value), false);
-    document.getElementById("result").scrollIntoView({ behavior: "smooth", block: "start" });
+    render(name, Number(yEl.value), Number(mEl.value), Number(dEl.value));
+    if (window.matchMedia("(max-width: 860px)").matches) {
+      document.getElementById("core").scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   });
 
-  document.getElementById("reset").addEventListener("click", function () {
-    nameEl.value = ""; yEl.value = ""; mEl.value = ""; fillDays(); dEl.value = "";
-    showError("");
-    render("TARO YAMADA", 1990, 5, 15, true);
-    nameEl.focus();
-  });
+  /* ===== 星空 ===== */
+  var canvas = document.getElementById("stars");
+  function drawStars() {
+    var dpr = window.devicePixelRatio || 1;
+    var w = canvas.clientWidth, h = canvas.clientHeight;
+    canvas.width = w * dpr; canvas.height = h * dpr;
+    var ctx = canvas.getContext("2d");
+    ctx.scale(dpr, dpr);
+    var seed = 7;
+    function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    var count = Math.round(w * h / 900);
+    for (var i = 0; i < count; i++) {
+      var x = rnd() * w, y = rnd() * h * 0.8;
+      var r = rnd() < 0.04 ? 1.4 + rnd() : 0.3 + rnd() * 0.7;
+      ctx.globalAlpha = (0.35 + rnd() * 0.65) * (1 - y / (h * 0.85));
+      ctx.fillStyle = rnd() < 0.15 ? "#cfe0ff" : "#ffffff";
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    }
+    // 海面のきらめき
+    for (var j = 0; j < count / 6; j++) {
+      var sx = rnd() * w, sy = h * (0.82 + rnd() * 0.18);
+      ctx.globalAlpha = 0.08 + rnd() * 0.15;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(sx, sy, 6 + rnd() * 30, 1);
+    }
+    ctx.globalAlpha = 1;
+  }
+  drawStars();
+  var t;
+  window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(drawStars, 150); });
 
-  // 初期表示は例として表示
-  render("TARO YAMADA", 1990, 5, 15, true);
-
-  // テスト用に公開
   window.__numerology = { calc: calc, normalizeName: normalizeName };
 })();
 </script>

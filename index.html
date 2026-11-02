@@ -9,23 +9,27 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>
-/* Layout: 黒いヘッダー → 星空の背景の上に「左：入力フォーム｜右：結果」→ 注意書きとボタン → 黒いフッター
-   結果は上から「基本となる3つの数（過去数・現在数・未来数）」→ Name / Birthday → 人物図と P・LP・S・M・D */
+/* Layout: 緑のヘッダー → 昼の森の背景の上に「左：入力フォーム｜右：結果」→ 注意書きとボタン → 緑のフッター
+   結果は上から「基本となる3つの数（過去数・現在数・未来数）」→ Name / Birthday → 人物図と P・LP・S・M・D → 画像で保存 */
 :root {
-  --night: #000000;
-  --sky-1: #071a44;
-  --sky-2: #1b4c9c;
-  --sky-3: #24386f;
-  --sea-1: #142c58;
-  --sea-2: #3d5b8e;
-  --gold: #e7c36a;
+  --night: #1f3d2b;      /* ヘッダー・フッター（深い森の緑） */
+  --sky-1: #f4fbe6;
+  --sky-2: #dcefc0;
+  --sky-3: #b9dd98;
+  --sea-1: #9ccd7e;
+  --sea-2: #86bf68;
+  --gold: #f3e3a0;       /* ヘッダーの文字 */
+  --title: #2f5a2c;      /* ページタイトル */
+  --text: #26371f;       /* 森の上の文字 */
+  --text-muted: #4a5c40;
+  --line-dark: rgba(38, 70, 36, .55);
   --white: #ffffff;
   --paper: rgba(234, 240, 250, 0.92);
   --paper-solid: #eaf0fa;
   --ink: #1d2a5c;
   --ink-muted: #4c5a86;
-  --btn-1: #23306e;
-  --btn-2: #5b3d86;
+  --btn-1: #2f6b3a;
+  --btn-2: #6a9a3a;
   --past: #e0245e;
   --present: #f1df3c;
   --future: #f0a12f;
@@ -33,7 +37,7 @@
   --cta-2: #f3d58f;
   --f-title: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
   --f-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 * { box-sizing: border-box; }
@@ -66,17 +70,19 @@ body {
   margin: 0;
 }
 
-/* ---------- hero (星空) ---------- */
+/* ---------- hero (昼の森。木や光は #forest キャンバスに描く) ---------- */
 .hero {
   position: relative;
   overflow: hidden;
-  background:
-    radial-gradient(ellipse 60% 40% at 55% 30%, rgba(120, 170, 255, .35), transparent 70%),
-    radial-gradient(ellipse 40% 30% at 20% 60%, rgba(110, 90, 200, .25), transparent 70%),
-    linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 35%, var(--sky-3) 62%, var(--sea-1) 78%, var(--sea-2) 100%);
+  color: var(--text);
+  background: linear-gradient(180deg, var(--sky-1) 0%, var(--sky-2) 35%, var(--sky-3) 62%, var(--sea-1) 82%, var(--sea-2) 100%);
   padding-block: 32px 56px;
 }
-#stars { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.f-label, .core-head h2, .who-row span, .n-name, .page-title p {
+  text-shadow: 0 0 6px rgba(255, 255, 255, .95), 0 0 2px rgba(255, 255, 255, .9);
+  font-weight: 700;
+}
+#forest { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
 .hero .inner { position: relative; display: grid; gap: 28px; }
 
 .page-title { justify-self: end; text-align: right; display: grid; gap: 6px; }
@@ -85,10 +91,10 @@ body {
   font-family: var(--f-title);
   font-style: italic;
   font-weight: 800;
-  color: var(--gold);
+  color: var(--title);
   font-size: clamp(24px, 3.4vw, 34px);
   line-height: 1.25;
-  text-shadow: 0 2px 10px rgba(0, 0, 0, .45);
+  text-shadow: 0 0 8px rgba(255, 255, 255, .9), 0 0 2px #fff;
   text-wrap: balance;
 }
 .page-title p { margin: 0; font-size: 12px; letter-spacing: .08em; }
@@ -103,7 +109,7 @@ body {
 /* ---------- form (左) ---------- */
 .form-col {
   padding-right: 22px;
-  border-right: 1px dashed rgba(255, 255, 255, .7);
+  border-right: 1px dashed var(--line-dark);
   display: grid;
   gap: 22px;
   align-content: start;
@@ -126,9 +132,9 @@ select, input[type="text"] {
 }
 input[type="text"] { letter-spacing: .05em; padding: 6px 12px; }
 input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
-.notes { margin: 6px 0 0; font-size: 11px; line-height: 1.6; color: rgba(255, 255, 255, .85); }
+.notes { margin: 6px 0 0; font-size: 11px; line-height: 1.6; color: var(--text-muted); }
 .notes p { margin: 0; }
-.error { color: #ffd1dc; background: rgba(160, 20, 60, .45); border-radius: 6px; padding: 6px 10px; font-size: 12.5px; margin: 0; }
+.error { color: #8a1033; background: rgba(255, 255, 255, .85); border: 1px solid #e0245e; border-radius: 6px; padding: 6px 10px; font-size: 12.5px; margin: 0; }
 .submit {
   justify-self: center;
   font: inherit;
@@ -150,7 +156,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   font-size: 11px;
   font-style: italic;
   line-height: 1.6;
-  color: rgba(255, 255, 255, .85);
+  color: var(--text-muted);
 }
 
 /* ---------- result (右) ---------- */
@@ -267,8 +273,37 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 .fig { grid-area: fig; align-self: center; display: grid; justify-items: center; position: relative; z-index: 1; }
 .fig svg { width: 100%; max-width: 190px; height: auto; display: block; }
 #arrows { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 2; }
-#arrows line { stroke: rgba(255, 255, 255, .85); stroke-width: 2; }
-#arrows path { fill: rgba(255, 255, 255, .85); }
+#arrows line { stroke: var(--title); stroke-width: 2; }
+#arrows path { fill: var(--title); }
+
+/* ---------- 画像で保存 ---------- */
+.export {
+  background: rgba(255, 255, 255, .8);
+  border-radius: 14px;
+  padding: 20px;
+  display: grid;
+  gap: 12px;
+  justify-items: center;
+  text-align: center;
+}
+.export h2 { margin: 0; font-family: var(--f-title); font-size: 20px; color: var(--title); }
+.export p { margin: 0; max-width: 46ch; font-size: 13px; color: var(--text); }
+.export .submit { margin-top: 0; }
+.export .submit:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+.img-msg:empty { display: none; }
+.img-out { display: grid; gap: 12px; justify-items: center; }
+.img-out img { width: 100%; max-width: 380px; border-radius: 10px; box-shadow: 0 4px 16px rgba(30, 60, 30, .25); }
+.save {
+  color: var(--white);
+  background: var(--title);
+  text-decoration: none;
+  font-weight: 700;
+  letter-spacing: .1em;
+  border-radius: 999px;
+  padding: 8px 28px;
+}
+.save:hover { filter: brightness(1.15); }
+.img-hint { font-size: 12px !important; color: var(--text-muted) !important; }
 
 /* ---------- 注意書き・ボタン ---------- */
 .after { position: relative; display: grid; gap: 34px; justify-items: center; padding-top: 30px; }
@@ -280,7 +315,10 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   font-weight: 600;
   font-size: 14.5px;
   text-align: center;
-  text-shadow: 0 1px 6px rgba(0, 0, 0, .6);
+  color: var(--text);
+  background: rgba(255, 255, 255, .72);
+  border-radius: 12px;
+  padding: 10px 18px;
 }
 .cta-row { display: flex; flex-wrap: wrap; gap: 20px 64px; justify-content: center; }
 .cta {
@@ -294,7 +332,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   font-size: 14px;
   text-decoration: none;
   letter-spacing: .06em;
-  border: 2px solid rgba(255, 255, 255, .85);
+  border: 2px solid var(--white);
 }
 .cta.learn { background: var(--cta-1); }
 .cta.session { background: var(--cta-2); }
@@ -308,7 +346,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 /* ---------- スマホ ---------- */
 @media (max-width: 860px) {
   .layout { grid-template-columns: minmax(0, 1fr); gap: 30px; }
-  .form-col { padding-right: 0; border-right: 0; border-bottom: 1px dashed rgba(255, 255, 255, .7); padding-bottom: 26px; min-height: 0; }
+  .form-col { padding-right: 0; border-right: 0; border-bottom: 1px dashed var(--line-dark); padding-bottom: 26px; min-height: 0; }
   .result-col { padding-left: 0; }
   .page-title { justify-self: center; text-align: center; }
 }
@@ -347,7 +385,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 </header>
 
 <main class="hero gutter">
-  <canvas id="stars" aria-hidden="true"></canvas>
+  <canvas id="forest" aria-hidden="true"></canvas>
   <div class="inner">
 
     <div class="page-title">
@@ -456,6 +494,18 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
             <line id="ar-D" marker-end="url(#ah)"/>
           </svg>
         </div>
+
+        <section class="export" aria-labelledby="export-h">
+          <h2 id="export-h">鑑定結果を画像で保存</h2>
+          <p>あなたのイメージキャラクター（森の妖精）を真ん中に、すべての数とキーワードを1枚の画像（1080×1350）にまとめます。キャラクターは現在数で決まります。</p>
+          <button type="button" class="submit" id="make-img" disabled>画像を作る</button>
+          <p class="img-msg" id="img-msg" role="status"></p>
+          <div class="img-out" id="img-out" hidden>
+            <img id="img-preview" alt="鑑定結果の画像">
+            <a class="save" id="img-save" href="#" download="numerology.png">画像を保存</a>
+            <p class="img-hint">スマホでは、画像を長押しして保存することもできます。</p>
+          </div>
+        </section>
 
       </div>
     </div>
@@ -590,7 +640,6 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   }
 
   /* ===== 表示 ===== */
-  var LABEL = { LP: "LP", S: "S", D: "D", P: "P", M: "M" };
   function setText(id, v) { document.getElementById(id).textContent = v; }
 
   function render(name, y, m, d) {
@@ -614,6 +663,12 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       }
     });
     drawArrows();
+    r.name = name;
+    r.birthText = y + "年" + m + "月" + d + "日生まれ";
+    lastResult = r;
+    makeBtn.disabled = false;
+    imgOut.hidden = true;
+    imgMsg.textContent = "";
   }
 
   /* ===== 矢印（ボックス → 頭・心・体） ===== */
@@ -676,38 +731,392 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     }
   });
 
-  /* ===== 星空 ===== */
-  var canvas = document.getElementById("stars");
-  function drawStars() {
+  /* ===== 昼の森（ページ背景と画像の両方で使う） ===== */
+  // sideTree：両端の大きな木の大きさ（0 なら描かない）
+  function drawForest(ctx, w, h, sideTree) {
+    var seed = 11;
+    function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
+    var u = Math.max(0.5, Math.min(w, 1200) / 1200);
+
+    var g = ctx.createLinearGradient(0, 0, 0, h);
+    g.addColorStop(0, "#f6fce9"); g.addColorStop(0.35, "#e1f1c6"); g.addColorStop(0.65, "#c4e3a3"); g.addColorStop(1, "#9fcf80");
+    ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+
+    // 右上からの日差し
+    var sx = w * 0.85, R = Math.max(w, h) * 0.6;
+    var sg = ctx.createRadialGradient(sx, 0, 0, sx, 0, R);
+    sg.addColorStop(0, "rgba(255,252,222,.95)"); sg.addColorStop(1, "rgba(255,250,210,0)");
+    ctx.fillStyle = sg; ctx.fillRect(0, 0, w, h);
+
+    function tree(x, base, sz, leaf, trunk, kind) {
+      ctx.fillStyle = trunk;
+      ctx.fillRect(x - sz * 0.07, base - sz * 0.55, sz * 0.14, sz * 0.6);
+      ctx.fillStyle = leaf;
+      if (kind < 0.5) {
+        [[0, -0.95, 0.5], [-0.32, -0.62, 0.38], [0.32, -0.62, 0.38], [0, -1.3, 0.3]].forEach(function (c) {
+          ctx.beginPath(); ctx.arc(x + c[0] * sz, base + c[1] * sz, c[2] * sz, 0, Math.PI * 2); ctx.fill();
+        });
+      } else {
+        for (var i = 0; i < 3; i++) {
+          var top = base - sz * (1.55 - i * 0.32), bot = base - sz * (0.75 - i * 0.28), half = sz * (0.32 + i * 0.1);
+          ctx.beginPath(); ctx.moveTo(x, top); ctx.lineTo(x + half, bot); ctx.lineTo(x - half, bot); ctx.closePath(); ctx.fill();
+        }
+      }
+    }
+    function layer(baseY, size, leaf, trunk, ground) {
+      var x = -size;
+      while (x < w + size) {
+        tree(x, baseY + rnd() * size * 0.12, size * (0.8 + rnd() * 0.5), leaf, trunk, rnd());
+        x += size * (0.55 + rnd() * 0.5);
+      }
+      ctx.fillStyle = ground; ctx.fillRect(0, baseY, w, h - baseY);
+    }
+    layer(h * 0.42, 70 * u, "#c8e4ab", "#b9cf98", "#d3eab6");
+    layer(h * 0.62, 95 * u, "#acd690", "#9eb97a", "#bde09d");
+    layer(h * 0.82, 120 * u, "#8fc574", "#8a7a52", "#a5d386");
+
+    // 光の筋
+    ctx.fillStyle = "rgba(255,255,240,.22)";
+    for (var r = 0; r < 5; r++) {
+      var x0 = sx - 60 * u + r * 30 * u, spread = (120 + r * 90) * u;
+      ctx.beginPath(); ctx.moveTo(x0, -10); ctx.lineTo(x0 + 18 * u, -10);
+      ctx.lineTo(x0 - h * 0.55 + spread * 0.3, h * 0.9); ctx.lineTo(x0 - h * 0.55, h * 0.9); ctx.closePath(); ctx.fill();
+    }
+
+    // 両端の大きな木
+    var big = sideTree === undefined ? 220 * u : sideTree;
+    if (big > 0) [[-big * 0.15, 1], [w + big * 0.15, -1]].forEach(function (side) {
+      ctx.fillStyle = "#8a6a45"; ctx.fillRect(side[0] - big * 0.1, h * 0.25, big * 0.2, h);
+      ctx.fillStyle = "#5e9e55";
+      for (var k = 0; k < 7; k++) {
+        ctx.beginPath(); ctx.arc(side[0] + side[1] * rnd() * big * 0.5, k * h / 7 * 0.6 + big * 0.2, big * (0.45 + rnd() * 0.2), 0, Math.PI * 2); ctx.fill();
+      }
+    });
+
+    // 草地と小さな花
+    var gy = h * 0.93;
+    ctx.fillStyle = "#86bf68"; ctx.fillRect(0, gy, w, h - gy);
+    for (var f = 0; f < w / 14; f++) {
+      ctx.fillStyle = ["#ffffff", "#ffd6e2", "#fff2a6"][f % 3];
+      ctx.beginPath(); ctx.arc(rnd() * w, gy + rnd() * (h - gy), 2.2 * u + rnd() * 2, 0, Math.PI * 2); ctx.fill();
+    }
+    // 木漏れ日のきらめき
+    for (var b = 0; b < (w * h) / 22000; b++) {
+      ctx.fillStyle = "rgba(255,255,225," + (0.15 + rnd() * 0.35) + ")";
+      ctx.beginPath(); ctx.arc(rnd() * w, rnd() * h * 0.9, (2 + rnd() * 9) * u, 0, Math.PI * 2); ctx.fill();
+    }
+  }
+
+  var canvas = document.getElementById("forest");
+  function paintBackground() {
     var dpr = window.devicePixelRatio || 1;
     var w = canvas.clientWidth, h = canvas.clientHeight;
     canvas.width = w * dpr; canvas.height = h * dpr;
     var ctx = canvas.getContext("2d");
     ctx.scale(dpr, dpr);
-    var seed = 7;
-    function rnd() { seed = (seed * 16807) % 2147483647; return seed / 2147483647; }
-    var count = Math.round(w * h / 900);
-    for (var i = 0; i < count; i++) {
-      var x = rnd() * w, y = rnd() * h * 0.8;
-      var r = rnd() < 0.04 ? 1.4 + rnd() : 0.3 + rnd() * 0.7;
-      ctx.globalAlpha = (0.35 + rnd() * 0.65) * (1 - y / (h * 0.85));
-      ctx.fillStyle = rnd() < 0.15 ? "#cfe0ff" : "#ffffff";
-      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-    }
-    // 海面のきらめき
-    for (var j = 0; j < count / 6; j++) {
-      var sx = rnd() * w, sy = h * (0.82 + rnd() * 0.18);
-      ctx.globalAlpha = 0.08 + rnd() * 0.15;
-      ctx.fillStyle = "#ffffff";
-      ctx.fillRect(sx, sy, 6 + rnd() * 30, 1);
-    }
-    ctx.globalAlpha = 1;
+    // 両端の木は、文字にかからない余白があるときだけ描く
+    var margin = (w - 1120) / 2;
+    drawForest(ctx, w, h, margin >= 110 ? margin * 0.9 : 0);
   }
-  drawStars();
+  paintBackground();
   var t;
-  window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(drawStars, 150); });
+  window.addEventListener("resize", function () { clearTimeout(t); t = setTimeout(paintBackground, 150); });
 
-  window.__numerology = { calc: calc, normalizeName: normalizeName };
+  /* ===== 森の妖精12人（現在数＝LP で決まる） =====
+     自作の絵を使うときは img に画像のパスを書く（例：img: "images/fairy-1.png"）。空なら下の SVG を使う */
+  var FAIRIES = {
+    1:  { name: "ひまわりの妖精",   catch: "先頭に立つ太陽",     dress: "#f6c945", hair: "#8a5a2b", wing: "#fff3b0", deco: "sunflower", img: "" },
+    2:  { name: "しずくの妖精",     catch: "やさしく寄りそう",   dress: "#8fd0f0", hair: "#5b6fa8", wing: "#dff4ff", deco: "drop",      img: "" },
+    3:  { name: "ちょうちょの妖精", catch: "楽しく表現する",     dress: "#f6a6c8", hair: "#c0603a", wing: "#ffd0ea", deco: "butterfly", img: "" },
+    4:  { name: "どんぐりの妖精",   catch: "コツコツ積み上げる", dress: "#c99a5b", hair: "#6b4426", wing: "#f3e2c0", deco: "acorn",     img: "" },
+    5:  { name: "風の妖精",         catch: "自由に飛び回る",     dress: "#8fe0c8", hair: "#3f8f7a", wing: "#e0fff4", deco: "wind",      img: "" },
+    6:  { name: "バラの妖精",       catch: "愛と美しさ",         dress: "#e9738f", hair: "#7a3040", wing: "#ffe0e8", deco: "rose",      img: "" },
+    7:  { name: "月の妖精",         catch: "静かに探究する",     dress: "#8a8ce0", hair: "#3a3f78", wing: "#e6e6ff", deco: "moon",      img: "" },
+    8:  { name: "金のりんごの妖精", catch: "実りと豊かさ",       dress: "#e9b934", hair: "#8a4a1f", wing: "#fff0c0", deco: "apple",     img: "" },
+    9:  { name: "虹の妖精",         catch: "すべてを包み込む",   dress: "#bba6ea", hair: "#6a4a8a", wing: "#f0e8ff", deco: "rainbow",   img: "" },
+    11: { name: "星の妖精",         catch: "ひらめきと直感",     dress: "#f3e58e", hair: "#b07a2a", wing: "#fffbe0", deco: "star",      img: "" },
+    22: { name: "大樹の妖精",       catch: "大きな夢を形に",     dress: "#63a85e", hair: "#4a3020", wing: "#dcf5d0", deco: "tree",      img: "" },
+    33: { name: "光の妖精",         catch: "無償の愛と癒し",     dress: "#fff6d8", hair: "#e0a84a", wing: "#ffffff", deco: "light",     img: "" }
+  };
+  // 過去数・現在数・未来数のカードに入れるひとこと
+  var SHORT = {
+    1: "はじまり・自立", 2: "調和・協力", 3: "創造・楽しさ", 4: "安定・努力", 5: "自由・変化", 6: "愛・奉仕",
+    7: "探究・知性", 8: "豊かさ・達成", 9: "博愛・完成", 11: "直感・ひらめき", 22: "大きな夢の実現", 33: "無償の愛・癒し"
+  };
+
+  var OL = ' stroke="#2a2a3a" stroke-width="2.5" stroke-linejoin="round"';
+  function starPath(cx, cy, R, r) {
+    var d = "";
+    for (var i = 0; i < 10; i++) {
+      var a = -Math.PI / 2 + i * Math.PI / 5, rad = i % 2 ? r : R;
+      d += (i ? "L" : "M") + (cx + Math.cos(a) * rad).toFixed(1) + " " + (cy + Math.sin(a) * rad).toFixed(1) + " ";
+    }
+    return d + "Z";
+  }
+  function flower(cx, cy, R, petal, center) {
+    var out = "";
+    for (var i = 0; i < 10; i++) {
+      out += '<ellipse cx="' + cx + '" cy="' + (cy - R * 0.62) + '" rx="' + R * 0.24 + '" ry="' + R * 0.42 + '" fill="' + petal + '" stroke="#2a2a3a" stroke-width="1.5" transform="rotate(' + i * 36 + ' ' + cx + ' ' + cy + ')"/>';
+    }
+    return out + '<circle cx="' + cx + '" cy="' + cy + '" r="' + R * 0.38 + '" fill="' + center + '"' + OL + '/>';
+  }
+  var HX = 146, HY = 178; // 右手の位置
+  var DECO = {
+    sunflower: function () { return flower(132, 44, 26, "#f7c531", "#7a4a1f") + flower(HX + 4, HY - 6, 14, "#f7c531", "#7a4a1f"); },
+    drop: function () {
+      var drop = function (x, y, s) { return '<path d="M' + x + ' ' + (y - s) + ' Q' + (x + s * 0.8) + ' ' + (y + s * 0.1) + ' ' + x + ' ' + (y + s * 0.7) + ' Q' + (x - s * 0.8) + ' ' + (y + s * 0.1) + ' ' + x + ' ' + (y - s) + ' Z" fill="#6cc4f0"' + OL + '/><ellipse cx="' + (x - s * 0.22) + '" cy="' + y + '" rx="' + s * 0.12 + '" ry="' + s * 0.22 + '" fill="#fff"/>'; };
+      return drop(134, 40, 20) + drop(HX + 4, HY - 4, 14);
+    },
+    butterfly: function () {
+      var bf = function (x, y, s) {
+        return '<ellipse cx="' + (x - s * 0.55) + '" cy="' + (y - s * 0.3) + '" rx="' + s * 0.55 + '" ry="' + s * 0.45 + '" fill="#f58ec0"' + OL + '/>' +
+          '<ellipse cx="' + (x + s * 0.55) + '" cy="' + (y - s * 0.3) + '" rx="' + s * 0.55 + '" ry="' + s * 0.45 + '" fill="#f58ec0"' + OL + '/>' +
+          '<ellipse cx="' + (x - s * 0.4) + '" cy="' + (y + s * 0.35) + '" rx="' + s * 0.35 + '" ry="' + s * 0.3 + '" fill="#b98af0"' + OL + '/>' +
+          '<ellipse cx="' + (x + s * 0.4) + '" cy="' + (y + s * 0.35) + '" rx="' + s * 0.35 + '" ry="' + s * 0.3 + '" fill="#b98af0"' + OL + '/>' +
+          '<rect x="' + (x - s * 0.08) + '" y="' + (y - s * 0.6) + '" width="' + s * 0.16 + '" height="' + s * 1.2 + '" rx="' + s * 0.08 + '" fill="#2a2a3a"/>';
+      };
+      return bf(134, 42, 22) + bf(HX + 12, HY - 26, 13);
+    },
+    acorn: function () {
+      var acorn = function (x, y, s) {
+        return '<ellipse cx="' + x + '" cy="' + (y + s * 0.35) + '" rx="' + s * 0.55 + '" ry="' + s * 0.7 + '" fill="#d9a35a"' + OL + '/>' +
+          '<path d="M' + (x - s * 0.7) + ' ' + y + ' Q' + x + ' ' + (y - s * 0.9) + ' ' + (x + s * 0.7) + ' ' + y + ' Z" fill="#7a5230"' + OL + '/>' +
+          '<rect x="' + (x - s * 0.08) + '" y="' + (y - s * 0.75) + '" width="' + s * 0.16 + '" height="' + s * 0.3 + '" fill="#5a3a20"/>';
+      };
+      return '<path d="M52 66 Q100 -6 148 66 Q100 52 52 66 Z" fill="#7a5230"' + OL + '/>' +
+        '<path d="M66 50 L80 62 M86 36 L96 58 M114 36 L104 58 M134 50 L120 62" stroke="#5a3a20" stroke-width="2"/>' +
+        '<rect x="96" y="14" width="8" height="16" rx="3" fill="#5a3a20"/>' + acorn(HX + 4, HY - 4, 15);
+    },
+    wind: function () {
+      return '<path d="M22 70 Q10 40 40 36 Q60 36 54 54 Q48 64 40 56" fill="none" stroke="#5fc9a8" stroke-width="4" stroke-linecap="round"/>' +
+        '<path d="M164 112 Q194 104 186 80 Q178 62 164 74" fill="none" stroke="#5fc9a8" stroke-width="4" stroke-linecap="round"/>' +
+        '<path d="M14 150 Q40 140 30 124" fill="none" stroke="#5fc9a8" stroke-width="3" stroke-linecap="round"/>' +
+        '<path d="M' + HX + ' ' + (HY + 4) + ' Q' + (HX + 26) + ' ' + (HY - 18) + ' ' + (HX + 6) + ' ' + (HY - 34) + ' Q' + (HX - 8) + ' ' + (HY - 12) + ' ' + HX + ' ' + (HY + 4) + ' Z" fill="#7dd36a"' + OL + '/>';
+    },
+    rose: function () {
+      var rose = function (x, y, s) {
+        return '<ellipse cx="' + (x - s * 0.9) + '" cy="' + (y + s * 0.5) + '" rx="' + s * 0.6 + '" ry="' + s * 0.3 + '" fill="#6cbf5a"' + OL + '/>' +
+          '<circle cx="' + x + '" cy="' + y + '" r="' + s + '" fill="#e2405f"' + OL + '/>' +
+          '<path d="M' + x + ' ' + y + ' m' + (-s * 0.5) + ' 0 a' + s * 0.5 + ' ' + s * 0.5 + ' 0 1 1 ' + s * 0.5 + ' ' + s * 0.5 + ' a' + s * 0.3 + ' ' + s * 0.3 + ' 0 1 1 ' + (-s * 0.1) + ' ' + (-s * 0.6) + '" fill="none" stroke="#9a1f3a" stroke-width="2"/>';
+      };
+      return rose(134, 44, 16) + rose(HX + 4, HY - 6, 12);
+    },
+    moon: function () {
+      var moon = function (x, y, s) { return '<path d="M' + x + ' ' + (y - s) + ' A' + s + ' ' + s + ' 0 1 0 ' + x + ' ' + (y + s) + ' A' + s * 1.35 + ' ' + s * 1.35 + ' 0 0 1 ' + x + ' ' + (y - s) + ' Z" fill="#f5d86a"' + OL + '/>'; };
+      return moon(130, 40, 20) + moon(HX + 2, HY - 6, 13) + '<path d="' + starPath(160, 24, 7, 3) + '" fill="#f5d86a"/>';
+    },
+    apple: function () {
+      return '<path d="M70 44 L78 22 L90 38 L100 16 L110 38 L122 22 L130 44 Z" fill="#f2c230"' + OL + '/>' +
+        '<circle cx="' + (HX + 4) + '" cy="' + (HY - 4) + '" r="14" fill="#f2c230"' + OL + '/>' +
+        '<path d="M' + (HX + 4) + ' ' + (HY - 18) + ' Q' + (HX + 16) + ' ' + (HY - 30) + ' ' + (HX + 20) + ' ' + (HY - 20) + ' Q' + (HX + 10) + ' ' + (HY - 14) + ' ' + (HX + 4) + ' ' + (HY - 18) + ' Z" fill="#6cbf5a" stroke="#2a2a3a" stroke-width="1.5"/>';
+    },
+    rainbow: function () {
+      var cols = ["#f47a7a", "#f6b24f", "#f5e05a", "#7fd37a", "#6cb6f0", "#a98af0"], out = "";
+      cols.forEach(function (c, i) { out += '<path d="M' + (30 + i * 7) + ' 70 A' + (70 - i * 7) + ' ' + (60 - i * 6) + ' 0 0 1 ' + (170 - i * 7) + ' 70" fill="none" stroke="' + c + '" stroke-width="7"/>'; });
+      return out;
+    },
+    star: function () {
+      return '<path d="' + starPath(132, 38, 22, 9) + '" fill="#f7d54a"' + OL + '/>' +
+        '<line x1="' + HX + '" y1="' + (HY + 6) + '" x2="' + (HX + 18) + '" y2="' + (HY - 34) + '" stroke="#8a5a2b" stroke-width="4" stroke-linecap="round"/>' +
+        '<path d="' + starPath(HX + 20, HY - 40, 14, 6) + '" fill="#f7d54a"' + OL + '/>';
+    },
+    tree: function () {
+      var out = "";
+      [[-40, 50], [-20, 34], [0, 28], [20, 34], [40, 50]].forEach(function (p, i) {
+        out += '<ellipse cx="' + (100 + p[0]) + '" cy="' + p[1] + '" rx="10" ry="18" fill="' + (i % 2 ? "#4f9a4a" : "#7cc46a") + '"' + OL + ' transform="rotate(' + p[0] * 0.8 + ' ' + (100 + p[0]) + ' ' + p[1] + ')"/>';
+      });
+      return out + '<rect x="' + (HX - 3) + '" y="' + (HY - 26) + '" width="6" height="30" fill="#8a6a45"/>' +
+        '<circle cx="' + HX + '" cy="' + (HY - 34) + '" r="14" fill="#6cbf5a"' + OL + '/>';
+    },
+    light: function () {
+      return '<ellipse cx="100" cy="22" rx="38" ry="9" fill="none" stroke="#f2c94c" stroke-width="5"/>' +
+        '<path d="M' + (HX + 4) + ' ' + (HY + 8) + ' C' + (HX - 18) + ' ' + (HY - 8) + ' ' + (HX - 6) + ' ' + (HY - 28) + ' ' + (HX + 4) + ' ' + (HY - 16) + ' C' + (HX + 14) + ' ' + (HY - 28) + ' ' + (HX + 26) + ' ' + (HY - 8) + ' ' + (HX + 4) + ' ' + (HY + 8) + ' Z" fill="#f47aa0"' + OL + '/>';
+    }
+  };
+
+  function fairySVG(n) {
+    var f = FAIRIES[n];
+    var glow = n === 33 ? '<circle cx="100" cy="130" r="96" fill="#fff6c8" opacity=".55"/>' : "";
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240" width="400" height="480">' + glow +
+      // 羽
+      '<ellipse cx="58" cy="120" rx="34" ry="52" fill="' + f.wing + '" opacity=".9" stroke="#2a2a3a" stroke-width="2" transform="rotate(-28 58 120)"/>' +
+      '<ellipse cx="142" cy="120" rx="34" ry="52" fill="' + f.wing + '" opacity=".9" stroke="#2a2a3a" stroke-width="2" transform="rotate(28 142 120)"/>' +
+      '<ellipse cx="66" cy="168" rx="20" ry="28" fill="' + f.wing + '" opacity=".9" stroke="#2a2a3a" stroke-width="2" transform="rotate(30 66 168)"/>' +
+      '<ellipse cx="134" cy="168" rx="20" ry="28" fill="' + f.wing + '" opacity=".9" stroke="#2a2a3a" stroke-width="2" transform="rotate(-30 134 168)"/>' +
+      // 足
+      '<rect x="86" y="196" width="11" height="26" rx="5" fill="#fff4e8"' + OL + '/><rect x="103" y="196" width="11" height="26" rx="5" fill="#fff4e8"' + OL + '/>' +
+      '<ellipse cx="90" cy="224" rx="10" ry="6" fill="' + f.hair + '"' + OL + '/><ellipse cx="110" cy="224" rx="10" ry="6" fill="' + f.hair + '"' + OL + '/>' +
+      // 腕
+      '<path d="M76 138 Q62 160 54 178" fill="none" stroke="#2a2a3a" stroke-width="12" stroke-linecap="round"/><path d="M76 138 Q62 160 54 178" fill="none" stroke="#fff4e8" stroke-width="7" stroke-linecap="round"/>' +
+      '<path d="M124 138 Q138 160 ' + HX + ' ' + HY + '" fill="none" stroke="#2a2a3a" stroke-width="12" stroke-linecap="round"/><path d="M124 138 Q138 160 ' + HX + ' ' + HY + '" fill="none" stroke="#fff4e8" stroke-width="7" stroke-linecap="round"/>' +
+      // ワンピース
+      '<path d="M72 128 Q100 118 128 128 L150 202 Q100 214 50 202 Z" fill="' + f.dress + '"' + OL + '/>' +
+      '<path d="M54 196 Q100 208 146 196" fill="none" stroke="#ffffff" stroke-width="3" opacity=".8"/>' +
+      // 頭
+      '<path d="M54 86 Q50 140 74 128 L126 128 Q150 140 146 86 Z" fill="' + f.hair + '"' + OL + '/>' +
+      '<circle cx="100" cy="82" r="44" fill="#fff4e8"' + OL + '/>' +
+      '<path d="M56 84 Q54 38 100 36 Q146 38 144 84 Q136 62 120 58 Q112 70 96 64 Q78 58 66 70 Q60 76 56 84 Z" fill="' + f.hair + '"' + OL + '/>' +
+      '<path d="M78 90 Q85 82 92 90" fill="none" stroke="#2a2a3a" stroke-width="3" stroke-linecap="round"/>' +
+      '<path d="M108 90 Q115 82 122 90" fill="none" stroke="#2a2a3a" stroke-width="3" stroke-linecap="round"/>' +
+      '<ellipse cx="74" cy="102" rx="7" ry="4" fill="#f4a7b9"/><ellipse cx="126" cy="102" rx="7" ry="4" fill="#f4a7b9"/>' +
+      '<path d="M93 104 Q100 111 107 104" fill="none" stroke="#2a2a3a" stroke-width="2.5" stroke-linecap="round"/>' +
+      DECO[f.deco]() +
+      '</svg>';
+  }
+
+  /* ===== 画像（1080×1350）を作る ===== */
+  var IMG_W = 1080, IMG_H = 1350;
+  var FONT_G = '"Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif';
+  var FONT_M = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif';
+  var COLORS = { past: "#e0245e", present: "#e3c81e", future: "#f0a12f", num: "#2f5a2c", ink: "#26371f", muted: "#4a5c40" };
+  var lastResult = null;
+
+  function loadImg(src) {
+    return new Promise(function (ok, ng) { var im = new Image(); im.onload = function () { ok(im); }; im.onerror = ng; im.src = src; });
+  }
+  function rrect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath();
+  }
+  function wrap(ctx, text, maxW) {
+    var lines = [], line = "";
+    text.split("").forEach(function (ch) {
+      if (ctx.measureText(line + ch).width > maxW && line) { lines.push(line); line = ch; } else { line += ch; }
+    });
+    if (line) lines.push(line);
+    return lines;
+  }
+  // キーワードを最大3つ、1行ずつ。長いものは文字を少し小さくし、それでも入らなければ折り返す
+  function keywordLines(ctx, k, v, maxW, maxLines, size) {
+    if (v === null) return [[k === "S" ? "母音がないため" : "子音がないため", size], ["計算できません", size]];
+    var out = [];
+    TEXTS[k][v].split("・").slice(0, 3).forEach(function (kw) {
+      var t = "・" + kw, fs = size;
+      ctx.font = "500 " + fs + "px " + FONT_G;
+      while (ctx.measureText(t).width > maxW && fs > size - 4) { fs--; ctx.font = "500 " + fs + "px " + FONT_G; }
+      wrap(ctx, t, maxW).forEach(function (ln) { out.push([ln, fs]); });
+    });
+    return out.slice(0, maxLines);
+  }
+  function drawLines(ctx, lines, x, y, step) {
+    lines.forEach(function (ln, i) { ctx.font = "500 " + ln[1] + "px " + FONT_G; ctx.fillText(ln[0], x, y + i * step); });
+  }
+  function fitFont(ctx, text, weight, size, family, maxW) {
+    do { ctx.font = weight + " " + size + "px " + family; size -= 2; } while (ctx.measureText(text).width > maxW && size > 20);
+  }
+  function glowText(ctx, text, x, y, fill) {
+    ctx.lineWidth = 8; ctx.strokeStyle = "rgba(255,255,255,.9)"; ctx.lineJoin = "round";
+    ctx.strokeText(text, x, y); ctx.fillStyle = fill; ctx.fillText(text, x, y);
+  }
+  function card(ctx, x, y, w, h, border) {
+    ctx.save();
+    ctx.shadowColor = "rgba(30,60,30,.18)"; ctx.shadowBlur = 16; ctx.shadowOffsetY = 4;
+    rrect(ctx, x, y, w, h, 22); ctx.fillStyle = "rgba(255,255,255,.93)"; ctx.fill();
+    ctx.restore();
+    rrect(ctx, x, y, w, h, 22); ctx.lineWidth = border ? 5 : 2; ctx.strokeStyle = border || "#cfe3c0"; ctx.stroke();
+  }
+
+  function buildImage(r) {
+    var fairy = FAIRIES[r.LP];
+    var strings = ["数秘自動計算 あなたの数秘カード", r.name, r.birthText, fairy.name, fairy.catch, "過去数現在数未来数生年月日の日月日",
+      "P（見た目）LP（頭）S（心）M（将来）D（体）・-計算できません母音子音がないため", "Numerology - 数秘自動計算 -"];
+    ["P", "LP", "S", "M", "D"].forEach(function (k) { if (r[k] !== null) strings.push(TEXTS[k][r[k]]); });
+    [r.past, r.present, r.future].forEach(function (v) { strings.push(SHORT[v]); });
+    var all = strings.join("") + "0123456789";
+    var fontsReady = document.fonts ? Promise.all([
+      document.fonts.load('700 40px "Zen Kaku Gothic New"', all),
+      document.fonts.load('400 40px "Zen Kaku Gothic New"', all),
+      document.fonts.load('800 40px "Shippori Mincho"', all)
+    ]).catch(function () {}) : Promise.resolve();
+    var src = fairy.img || ("data:image/svg+xml;charset=utf-8," + encodeURIComponent(fairySVG(r.LP)));
+
+    return Promise.all([fontsReady, loadImg(src)]).then(function (res) {
+      var im = res[1];
+      var cv = document.createElement("canvas");
+      cv.width = IMG_W; cv.height = IMG_H;
+      var ctx = cv.getContext("2d");
+      drawForest(ctx, IMG_W, IMG_H);
+      ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+
+      // 見出し・名前・生年月日
+      ctx.font = "800 34px " + FONT_M; glowText(ctx, "数秘自動計算 ・ あなたの数秘カード", 540, 66, COLORS.num);
+      fitFont(ctx, r.name, "700", 54, FONT_G, 960); glowText(ctx, r.name, 540, 134, COLORS.ink);
+      ctx.font = "500 28px " + FONT_G; glowText(ctx, r.birthText, 540, 180, COLORS.muted);
+
+      // 過去数・現在数・未来数
+      [["過去数", "生年月日の日", r.past, COLORS.past], ["現在数", "生年月日", r.present, COLORS.present], ["未来数", "生年月日の月日", r.future, COLORS.future]]
+        .forEach(function (c, i) {
+          var x = 60 + i * 330, y = 208, w = 300, h = 150;
+          card(ctx, x, y, w, h, c[3]);
+          ctx.textAlign = "left";
+          ctx.fillStyle = COLORS.ink; ctx.font = "700 30px " + FONT_G; ctx.fillText(c[0], x + 24, y + 48);
+          ctx.fillStyle = COLORS.muted; ctx.font = "500 18px " + FONT_G; ctx.fillText(c[1], x + 24, y + 76);
+          ctx.textAlign = "right"; ctx.fillStyle = COLORS.num; ctx.font = "700 72px " + FONT_G; ctx.fillText(c[2], x + w - 22, y + 82);
+          ctx.textAlign = "center"; ctx.fillStyle = COLORS.ink; ctx.font = "700 24px " + FONT_G; ctx.fillText(SHORT[c[2]], x + w / 2, y + 126);
+        });
+
+      // 中央の妖精
+      var glow = ctx.createRadialGradient(540, 630, 20, 540, 630, 240);
+      glow.addColorStop(0, "rgba(255,255,235,.95)"); glow.addColorStop(1, "rgba(255,255,235,0)");
+      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(540, 630, 240, 0, Math.PI * 2); ctx.fill();
+      var fw = 360, fh = fw * (im.height / im.width || 1.2);
+      if (fh > 440) { fh = 440; fw = fh * (im.width / im.height); }
+      ctx.drawImage(im, 540 - fw / 2, 412 + (440 - fh) / 2, fw, fh);
+      ctx.textAlign = "center";
+      ctx.font = "800 44px " + FONT_M; glowText(ctx, fairy.name, 540, 900, COLORS.num);
+      ctx.font = "700 26px " + FONT_G; glowText(ctx, "「" + fairy.catch + "」", 540, 942, COLORS.ink);
+
+      // 周りの5つの数
+      function sideCard(k, label, x, y) {
+        var w = 290, h = 250, v = r[k];
+        card(ctx, x, y, w, h, null);
+        ctx.textAlign = "left"; ctx.fillStyle = COLORS.ink; ctx.font = "700 25px " + FONT_G; ctx.fillText(label, x + 20, y + 42);
+        ctx.textAlign = "right"; ctx.fillStyle = COLORS.num; ctx.font = "700 66px " + FONT_G; ctx.fillText(v === null ? "-" : v, x + w - 20, y + 76);
+        ctx.strokeStyle = "#cfe3c0"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 20, y + 96); ctx.lineTo(x + w - 20, y + 96); ctx.stroke();
+        ctx.textAlign = "left"; ctx.fillStyle = COLORS.ink;
+        drawLines(ctx, keywordLines(ctx, k, v, w - 40, 4, 21), x + 20, y + 132, 31);
+      }
+      sideCard("P", "P（見た目）", 30, 396);
+      sideCard("M", "M（将来）", 30, 666);
+      sideCard("LP", "LP（頭）", 760, 396);
+      sideCard("S", "S（心）", 760, 666);
+
+      // D は下の横長カード
+      var dx = 190, dy = 978, dw = 700, dh = 196;
+      card(ctx, dx, dy, dw, dh, null);
+      ctx.textAlign = "left"; ctx.fillStyle = COLORS.ink; ctx.font = "700 25px " + FONT_G; ctx.fillText("D（体）", dx + 28, dy + 50);
+      ctx.fillStyle = COLORS.num; ctx.font = "700 76px " + FONT_G; ctx.fillText(r.D, dx + 28, dy + 140);
+      ctx.strokeStyle = "#cfe3c0"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(dx + 190, dy + 26); ctx.lineTo(dx + 190, dy + dh - 26); ctx.stroke();
+      ctx.fillStyle = COLORS.ink;
+      drawLines(ctx, keywordLines(ctx, "D", r.D, dw - 250, 4, 22), dx + 216, dy + 56, 34);
+
+      // フッター
+      ctx.textAlign = "center"; ctx.font = "italic 600 22px " + FONT_M; glowText(ctx, "Numerology - 数秘自動計算 -", 540, 1300, COLORS.muted);
+      return cv.toDataURL("image/png");
+    });
+  }
+
+  var makeBtn = document.getElementById("make-img");
+  var imgOut = document.getElementById("img-out");
+  var imgPrev = document.getElementById("img-preview");
+  var imgSave = document.getElementById("img-save");
+  var imgMsg = document.getElementById("img-msg");
+  makeBtn.addEventListener("click", function () {
+    if (!lastResult) return;
+    makeBtn.disabled = true; imgMsg.textContent = "画像を作っています…";
+    buildImage(lastResult).then(function (url) {
+      imgPrev.src = url;
+      imgSave.href = url;
+      imgSave.download = "numerology_" + lastResult.name.replace(/ /g, "_") + ".png";
+      imgOut.hidden = false;
+      imgMsg.textContent = "";
+    }).catch(function () {
+      imgMsg.textContent = "画像を作れませんでした。ページを読み込み直して、もう一度お試しください。";
+    }).then(function () { makeBtn.disabled = false; });
+  });
+
+  window.__numerology = { calc: calc, normalizeName: normalizeName, fairySVG: fairySVG, FAIRIES: FAIRIES, buildImage: buildImage };
 })();
 </script>
 </body>

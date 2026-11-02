@@ -174,38 +174,15 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   text-align: center;
 }
 .core-head h2 small { font-size: .74em; }
-.mini-row { display: flex; gap: 14px; }
-.mini {
-  width: 64px; height: 42px;
-  display: grid; place-items: center;
-  background: var(--paper-solid);
-  color: var(--ink);
-  border-radius: 4px;
-  border-bottom: 3px solid;
-  font-weight: 700;
-  font-size: 16px;
-  font-variant-numeric: tabular-nums;
-}
-.mini.past { border-color: var(--past); }
-.mini.present { border-color: var(--present); }
-.mini.future { border-color: var(--future); }
-.core-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 150px)); gap: 12px; justify-content: center; width: 100%; }
-.core-card {
-  background: var(--paper-solid);
-  color: var(--ink);
-  border: 2px solid;
-  border-radius: 9px;
-  padding: 10px 14px;
-  display: grid;
-  gap: 6px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
-}
-.core-card.past { border-color: var(--past); }
-.core-card.present { border-color: var(--present); }
-.core-card.future { border-color: var(--future); }
-.core-card .top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; font-size: 16px; font-weight: 700; letter-spacing: .06em; }
-.core-card .top b { font-size: 18px; font-variant-numeric: tabular-nums; }
-.core-card .src { font-size: 15px; font-weight: 700; letter-spacing: .08em; }
+.core-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; width: 100%; }
+.core-box .n-num { border-bottom-width: 3px; }
+.core-box.past .n-num, .core-box.past.done .n-num { border-bottom-color: var(--past); }
+.core-box.present .n-num, .core-box.present.done .n-num { border-bottom-color: var(--present); }
+.core-box.future .n-num, .core-box.future.done .n-num { border-bottom-color: var(--future); }
+.core-box .n-text { border: 2px solid; min-height: 0; }
+.core-box.past .n-text { border-color: var(--past); }
+.core-box.present .n-text { border-color: var(--present); }
+.core-box.future .n-text { border-color: var(--future); }
 
 /* Name / Birthday */
 .who { display: grid; gap: 14px; max-width: 360px; }
@@ -343,6 +320,9 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 .site-footer p { margin: 0; font-family: var(--f-title); font-style: italic; font-size: 12px; letter-spacing: .1em; color: rgba(255, 255, 255, .85); }
 
 /* ---------- スマホ ---------- */
+@media (max-width: 1000px) and (min-width: 641px) {
+  .core-cards { grid-template-columns: minmax(0, 1fr); }
+}
 @media (max-width: 860px) {
   .layout { grid-template-columns: minmax(0, 1fr); gap: 30px; }
   .form-col { padding-right: 0; border-right: 0; border-bottom: 1px dashed var(--line-dark); padding-bottom: 26px; min-height: 0; }
@@ -352,11 +332,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 @media (max-width: 640px) {
   .chart { grid-template-columns: minmax(0, 1fr); row-gap: 18px; }
   .n-text { min-height: 0; }
-  .core-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .core-card { padding: 8px; }
-  .core-card .top { font-size: 13.5px; flex-direction: column; gap: 0; align-items: flex-start; }
-  .core-card .src { font-size: 12px; letter-spacing: 0; }
-  .mini { width: 54px; }
+  .core-cards { grid-template-columns: minmax(0, 1fr); }
   .cta { min-width: 0; width: 100%; }
   .cta-row { width: 100%; display: grid; gap: 14px; }
   .site-footer .inner { justify-content: center; }
@@ -417,16 +393,11 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
         <section class="core" id="core" aria-labelledby="core-h">
           <div class="core-head">
             <h2 id="core-h">あなた<small>の</small>基本<small>となる</small>３<small>つの</small><br>魂<small>の</small>数字<small>は…</small></h2>
-            <div class="mini-row" aria-hidden="true">
-              <div class="mini past" id="mini-past"></div>
-              <div class="mini present" id="mini-present"></div>
-              <div class="mini future" id="mini-future"></div>
-            </div>
           </div>
           <div class="core-cards">
-            <div class="core-card past"><div class="top"><span>過去数</span><b id="v-past"></b></div><div class="src">生年月日の日</div></div>
-            <div class="core-card present"><div class="top"><span>現在数</span><b id="v-present"></b></div><div class="src">生年月日</div></div>
-            <div class="core-card future"><div class="top"><span>未来数</span><b id="v-future"></b></div><div class="src">生年月日の月日</div></div>
+            <div class="n-box core-box past" data-k="past"><div class="n-tab"><div class="n-num">-</div><div class="n-head"><span class="n-name">過去数</span><span class="n-desc">子どものころから持っている資質。これまでに育ててきた力</span></div></div><div class="n-text"></div></div>
+            <div class="n-box core-box present" data-k="present"><div class="n-tab"><div class="n-num">-</div><div class="n-head"><span class="n-name">現在数</span><span class="n-desc">いまの人生で取り組むテーマ。いま発揮している力</span></div></div><div class="n-text"></div></div>
+            <div class="n-box core-box future" data-k="future"><div class="n-tab"><div class="n-num">-</div><div class="n-head"><span class="n-name">未来数</span><span class="n-desc">これから育っていく可能性。未来で花ひらく力</span></div></div><div class="n-text"></div></div>
           </div>
         </section>
 
@@ -548,6 +519,51 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       11: "直感に従いたい・純粋でいたい・美しい世界を見たい・人に光を届けたい・ありのままでいたい・嘘やごまかしは苦手",
       22: "大きなことを成し遂げたい・社会の役に立ちたい・理想を現実にしたい・ゆるぎない基盤が欲しい・妥協は苦手",
       33: "愛を分かち合いたい・自由に創造したい・人を笑顔にしたい・常識にとらわれたくない・心のままに生きたい"
+    },
+    // 過去数：子どものころから持っている資質・これまでに育ててきた力
+    past: {
+      1: "人に頼らず自分でやる・負けず嫌い・思い立ったらすぐ動く・自分の意見をはっきり言う・一人でも平気・目立つ役を任されやすい",
+      2: "人の気持ちを察する・もめごとをまとめる・友だちに寄りそう・おとなしく見えて芯がある・人の話をよく聞く・誰かと一緒に取り組むのが好き",
+      3: "明るく人気者・おしゃべりが得意・絵や歌など表現が好き・好奇心いっぱい・人を笑わせる・楽しいことを見つける天才",
+      4: "まじめにコツコツ取り組む・約束を守る・片づけや準備が得意・ルールを大切にする・我慢強い・周りから信頼される",
+      5: "じっとしていられない・新しいことに飛びつく・何でも器用にこなす・友だちの輪が広い・自由が好き・変化に強い",
+      6: "面倒見がいい・家族や友だちを大切にする・お世話が好き・きれいなものに囲まれていたい・責任感が強い・頼られると張り切る",
+      7: "一人で考えるのが好き・「なぜ？」を追いかける・本や調べものが好き・観察力がある・こだわりが強い・大人びている",
+      8: "しっかり者・目標に向かって頑張れる・リーダー役が似合う・負けん気が強い・お金や数字に強い・実力で認められる",
+      9: "誰にでもやさしい・困っている人を放っておけない・大らか・感受性が豊か・年上とも年下とも仲良くなれる・夢見がち",
+      11: "感覚が鋭い・人の気持ちが自然とわかる・ひらめきで動く・繊細で傷つきやすい・不思議なことに惹かれる・純粋な心",
+      22: "大きな夢を持つ・計画を立てて形にする・責任ある役を任される・現実的でしっかり者・周りを支える土台になる・粘り強い",
+      33: "天真爛漫・独特の感性・誰とでも心を通わせる・人を癒やす雰囲気・自由な発想・周りを明るく包み込む"
+    },
+    // 現在数：いまの人生で取り組むテーマ・いま発揮している力
+    present: {
+      1: "自分の道を自分で選ぶ・新しいことに挑戦する・決断力を磨く・人を引っぱる経験を積む・自分らしさを表に出す・独り立ちを考える",
+      2: "人との協力を大切にする・パートナーシップを育てる・支える力を活かす・気持ちを言葉にする練習・調和をつくる・聞き役として信頼される",
+      3: "好きなことを表現する・楽しむことを大切にする・発信する・人とのつながりを広げる・アイディアを形にする・明るさで場を動かす",
+      4: "生活の土台を整える・コツコツ積み上げる・仕組みやルールをつくる・信頼を重ねる・計画どおりに進める・安心できる場所をつくる",
+      5: "変化を受け入れる・新しい世界を体験する・自由な働き方を探す・動きながら学ぶ・好奇心を活かす・身軽に動く",
+      6: "身近な人を大切にする・人を育てる・責任ある立場を引き受ける・美しい暮らしをつくる・愛情を表現する・家族や仲間を守る",
+      7: "専門性を深める・学び続ける・本質を探る・自分の内面と向き合う・一人の時間を大切にする・知識を人に伝える",
+      8: "目標を達成する・成果を形にする・お金や仕組みを動かす・リーダーとして立つ・実力を発揮する・豊かさを受け取る",
+      9: "人の役に立つ・広い視野で物事を見る・手放して次へ進む・多くの人を受け入れる・経験をまとめる・奉仕の心を活かす",
+      11: "直感を信じて動く・人に気づきや希望を届ける・感性を活かす・心のバランスを保つ・見えないものを言葉にする・自分の使命に気づく",
+      22: "大きな構想を現実にする・社会の役に立つ仕組みをつくる・理想と現実をつなぐ・多くの人と協力する・ぶれない基盤を築く",
+      33: "愛を表現する・人を癒やす・自分の感性を信じる・常識にとらわれずに生きる・周りを笑顔にする・自由と責任を両立する"
+    },
+    // 未来数：これから育っていく可能性・未来で花ひらく力
+    future: {
+      1: "自分の道を切りひらくリーダーになる・独立や起業・新しい分野の先駆けになる・自信を持って決断できる・自分らしさが輝く",
+      2: "信頼できるパートナーに恵まれる・人と人をつなぐ役割・穏やかで温かい人間関係・支え合う喜び・調和の中心になる",
+      3: "好きなことで輝く・表現や創作が実を結ぶ・人を元気にする存在・笑顔の多い人生・楽しさを広める",
+      4: "安定した暮らしを手に入れる・長く続くものを残す・信頼される人になる・心が落ち着く・堅実に豊かになる",
+      5: "自由で軽やかな生き方・世界を広げる・多くの経験が力になる・変化を楽しめる・新しい出会いに恵まれる",
+      6: "愛にあふれた家庭や居場所・人を育てる立場・美しいものに囲まれた暮らし・頼られ感謝される・与える喜び",
+      7: "専門家として認められる・深い知恵を身につける・心の平和・自分の世界を確立する・静かで満ちた時間",
+      8: "豊かさと成功を手にする・大きな仕事を任される・影響力を持つ・努力が実る・物と心の両方が満たされる",
+      9: "多くの人を助ける存在・世界とつながる・人生の集大成・大らかな心で生きる・人から慕われる",
+      11: "人に希望を届ける存在・直感が冴えわたる・心の道しるべになる・感性を活かす仕事・魂の目覚め",
+      22: "夢を大きな形にする・社会に残る仕事・多くの人の暮らしを支える・理想を現実にする力・ゆるぎない存在",
+      33: "愛そのものを生きる・人を癒やす存在になる・独自の世界観が花ひらく・自由で満たされた人生・周りを照らす光"
     }
   };
 
@@ -612,9 +628,6 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     var r = calc(name, y, m, d);
     setText("out-name", name);
     setText("out-birth", y + "/" + m + "/" + d);
-    setText("mini-past", r.past); setText("v-past", r.past);
-    setText("mini-present", r.present); setText("v-present", r.present);
-    setText("mini-future", r.future); setText("v-future", r.future);
     document.querySelectorAll(".n-box").forEach(function (box) {
       var k = box.dataset.k, v = r[k];
       var num = box.querySelector(".n-num"), txt = box.querySelector(".n-text");
@@ -940,6 +953,8 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       var t = "・" + kw, fs = size;
       ctx.font = "500 " + fs + "px " + FONT_G;
       while (ctx.measureText(t).width > maxW && fs > size - 4) { fs--; ctx.font = "500 " + fs + "px " + FONT_G; }
+      // 小さくしても入らないときは、元の大きさのまま折り返す
+      if (ctx.measureText(t).width > maxW) { fs = size; ctx.font = "500 " + fs + "px " + FONT_G; }
       wrap(ctx, t, maxW).forEach(function (ln) { out.push([ln, fs]); });
     });
     return out.slice(0, maxLines);
@@ -964,7 +979,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 
   function buildImage(r) {
     var fairy = FAIRIES[r.LP];
-    var strings = ["数秘自動計算 あなたの数秘カード", r.name, r.birthText, fairy.name, fairy.catch, "過去数現在数未来数生年月日の日月日",
+    var strings = ["数秘自動計算 あなたの数秘カード", r.name, r.birthText, fairy.name, fairy.catch, "過去数現在数未来数これまでのいまの自分",
       "第一印象・見た目性格・考え方心の願い・好き嫌い将来のテーマ行動・役割PLSMD()・-計算できません母音子音がないため", "Numerology - 数秘自動計算 -"];
     ["P", "LP", "S", "M", "D"].forEach(function (k) { if (r[k] !== null) strings.push(TEXTS[k][r[k]]); });
     [r.past, r.present, r.future].forEach(function (v) { strings.push(SHORT[v]); });
@@ -990,7 +1005,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       ctx.font = "500 28px " + FONT_G; glowText(ctx, r.birthText, 540, 180, COLORS.muted);
 
       // 過去数・現在数・未来数
-      [["過去数", "生年月日の日", r.past, COLORS.past], ["現在数", "生年月日", r.present, COLORS.present], ["未来数", "生年月日の月日", r.future, COLORS.future]]
+      [["過去数", "これまでの自分", r.past, COLORS.past], ["現在数", "いまの自分", r.present, COLORS.present], ["未来数", "これからの自分", r.future, COLORS.future]]
         .forEach(function (c, i) {
           var x = 60 + i * 330, y = 208, w = 300, h = 150;
           card(ctx, x, y, w, h, c[3]);

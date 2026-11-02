@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>数秘術 鑑定計算機</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Shippori+Mincho:wght@500;700&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* Layout: 一列の縦長ページ。入力フォーム → 「基本の3つの数」(人物図＋3枚の札) → 名前・生年月日 → 詳細鑑定 */
+:root {
+  --bg: #f3f4f7;
+  --surface: #ffffff;
+  --ink: #1f2338;
+  --muted: #5d6178;
+  --line: #dcdfe8;
+  --figure: #c9cde0;
+  --figure-deep: #a9afcb;
+  --c-life: #2f6f86;      /* ライフパス数 */
+  --c-destiny: #a8762b;   /* ディスティニー数 */
+  --c-soul: #b04f6a;      /* ソウル数 */
+  --on-badge: #ffffff;
+  --focus: #2f6f86;
+  --error: #b3261e;
+  --f-display: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
+  --f-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  --f-num: "Cormorant Garamond", "Times New Roman", serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #161827;
+    --surface: #1f2235;
+    --ink: #e9eaf2;
+    --muted: #a3a7bf;
+    --line: #34384f;
+    --figure: #3b4060;
+    --figure-deep: #4b5176;
+    --c-life: #5fb3cc;
+    --c-destiny: #d9a557;
+    --c-soul: #e08aa2;
+    --on-badge: #161827;
+    --focus: #5fb3cc;
+    --error: #ff8a80;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #161827;
+  --surface: #1f2235;
+  --ink: #e9eaf2;
+  --muted: #a3a7bf;
+  --line: #34384f;
+  --figure: #3b4060;
+  --figure-deep: #4b5176;
+  --c-life: #5fb3cc;
+  --c-destiny: #d9a557;
+  --c-soul: #e08aa2;
+  --on-badge: #161827;
+  --focus: #5fb3cc;
+  --error: #ff8a80;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 15px;
+  line-height: 1.8;
+}
+.wrap {
+  max-width: 880px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 64px;
+  display: grid;
+  gap: 40px;
+}
+
+/* ---------- header ---------- */
+header { display: grid; gap: 6px; }
+.eyebrow {
+  font-size: 12px;
+  letter-spacing: .18em;
+  color: var(--muted);
+  margin: 0;
+}
+h1 {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: clamp(26px, 5vw, 36px);
+  line-height: 1.35;
+  margin: 0;
+  text-wrap: balance;
+}
+.lead { margin: 0; color: var(--muted); max-width: 60ch; }
+
+/* ---------- form ---------- */
+form {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px;
+  display: grid;
+  gap: 20px;
+}
+.field { display: grid; gap: 6px; min-width: 0; }
+.field > label, .field > .label {
+  font-weight: 700;
+  font-size: 14px;
+}
+.hint { font-size: 12.5px; color: var(--muted); margin: 0; }
+input[type="text"], select {
+  font: inherit;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+  width: 100%;
+  min-width: 0;
+}
+input[type="text"] { letter-spacing: .06em; text-transform: uppercase; }
+input[type="text"]::placeholder { text-transform: none; letter-spacing: 0; color: var(--muted); }
+.date-row { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 8px; }
+.date-row label { display: grid; gap: 2px; font-size: 12px; color: var(--muted); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.error { color: var(--error); font-size: 13.5px; margin: 0; }
+.actions { display: flex; gap: 12px; flex-wrap: wrap; align-items: center; }
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 11px 32px;
+  font-weight: 700;
+  letter-spacing: .1em;
+}
+.btn-primary { background: var(--ink); color: var(--bg); }
+.btn-primary:hover { opacity: .88; }
+.btn-ghost { background: transparent; color: var(--muted); border-color: var(--line); padding-inline: 20px; letter-spacing: .04em; font-weight: 500; }
+.btn-ghost:hover { color: var(--ink); }
+
+/* ---------- result ---------- */
+#result { display: grid; gap: 40px; scroll-margin-top: 16px; }
+.sample-note {
+  justify-self: start;
+  font-size: 12.5px;
+  color: var(--muted);
+  border: 1px dashed var(--line);
+  border-radius: 999px;
+  padding: 2px 12px;
+  margin: 0 0 -24px;
+}
+
+.core {
+  display: grid;
+  gap: 20px;
+}
+.core h2 {
+  font-family: var(--f-display);
+  font-size: clamp(22px, 4.2vw, 30px);
+  margin: 0;
+  text-align: center;
+  text-wrap: balance;
+}
+.core-body {
+  display: grid;
+  grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+  gap: 28px;
+  align-items: center;
+}
+.figure-box { display: grid; justify-items: center; }
+.figure-box svg { width: 100%; max-width: 260px; height: auto; display: block; }
+.fig-body { fill: var(--figure); }
+.fig-deep { fill: var(--figure-deep); }
+.fig-arm { stroke: var(--figure); fill: none; stroke-width: 15; stroke-linecap: round; }
+.fig-halo { fill: none; stroke: var(--c-destiny); stroke-width: 1.5; stroke-dasharray: 3 5; }
+.fig-heart-glow { fill: var(--c-soul); opacity: .18; }
+.fig-ground { fill: var(--c-life); opacity: .16; }
+.fig-path { fill: none; stroke: var(--c-life); stroke-width: 2; stroke-dasharray: 2 6; stroke-linecap: round; opacity: .7; }
+.fig-star { fill: var(--c-destiny); opacity: .55; }
+.badge-life { fill: var(--c-life); }
+.badge-destiny { fill: var(--c-destiny); }
+.badge-soul { fill: var(--c-soul); }
+.badge-num {
+  fill: var(--on-badge);
+  font-family: var(--f-num);
+  font-weight: 700;
+  font-size: 24px;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.core-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.core-item {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 16px;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 18px;
+}
+.core-num {
+  font-family: var(--f-num);
+  font-weight: 700;
+  font-size: 54px;
+  line-height: 1;
+  text-align: center;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.core-item[data-k="life"] .core-num { color: var(--c-life); }
+.core-item[data-k="destiny"] .core-num { color: var(--c-destiny); }
+.core-item[data-k="soul"] .core-num { color: var(--c-soul); }
+.core-name { font-weight: 700; margin: 0; font-size: 15px; }
+.core-where { font-size: 12px; color: var(--muted); margin: 0; letter-spacing: .04em; }
+.core-key { margin: 2px 0 0; font-family: var(--f-display); font-size: 16px; }
+
+/* name / birthday */
+.person {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-block: 1px solid var(--line);
+}
+.person > div { padding: 14px 4px; display: grid; gap: 2px; min-width: 0; }
+.person > div + div { border-left: 1px solid var(--line); padding-left: 20px; }
+.person dt { font-size: 12px; color: var(--muted); letter-spacing: .12em; }
+.person dd { margin: 0; font-family: var(--f-display); font-size: clamp(18px, 3.4vw, 22px); font-weight: 700; overflow-wrap: anywhere; }
+
+/* letters table */
+.letters-wrap { overflow-x: auto; }
+.letters { display: flex; gap: 4px; flex-wrap: wrap; }
+.letter {
+  display: grid;
+  justify-items: center;
+  min-width: 26px;
+  padding: 4px 2px;
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+}
+.letter b { font-family: var(--f-num); font-size: 18px; line-height: 1.1; font-weight: 600; }
+.letter span { font-size: 12px; color: var(--muted); }
+.letter.vowel { background: color-mix(in srgb, var(--c-soul) 14%, transparent); }
+.letter.space { min-width: 12px; }
+.legend { font-size: 12px; color: var(--muted); margin: 6px 0 0; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 3px; background: color-mix(in srgb, var(--c-soul) 30%, transparent); margin-right: 4px; vertical-align: -1px; }
+
+/* detail sections */
+.details { display: grid; gap: 20px; }
+.details > h2, .others h2 {
+  font-family: var(--f-display);
+  font-size: 22px;
+  margin: 0;
+}
+.detail {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 24px;
+  display: grid;
+  gap: 14px;
+}
+.detail-head { display: flex; gap: 18px; align-items: center; }
+.detail-num {
+  flex: none;
+  width: 64px; height: 64px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--f-num);
+  font-size: 34px;
+  font-weight: 700;
+  color: var(--on-badge);
+}
+.detail[data-k="life"] .detail-num { background: var(--c-life); }
+.detail[data-k="destiny"] .detail-num { background: var(--c-destiny); }
+.detail[data-k="soul"] .detail-num { background: var(--c-soul); }
+.detail-title { margin: 0; font-size: 17px; font-weight: 700; }
+.detail-sub { margin: 0; font-size: 13px; color: var(--muted); }
+.detail h4 { margin: 0; font-family: var(--f-display); font-size: 19px; }
+.detail p { margin: 0; max-width: 65ch; }
+.calc {
+  font-size: 13px;
+  color: var(--muted);
+  background: var(--bg);
+  border-radius: 8px;
+  padding: 8px 12px;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.tags li { font-size: 13px; border: 1px solid var(--line); border-radius: 999px; padding: 1px 12px; }
+.challenge { font-size: 14px; }
+.challenge strong { color: var(--muted); font-weight: 700; margin-right: 6px; }
+.master { font-size: 12px; font-weight: 700; color: var(--c-destiny); letter-spacing: .08em; }
+
+.others { display: grid; gap: 14px; }
+.others-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.other {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  background: var(--surface);
+}
+.other .n { font-family: var(--f-num); font-size: 40px; font-weight: 700; line-height: 1; }
+.other h3 { margin: 0; font-size: 14.5px; }
+.other p { margin: 0; font-size: 13.5px; }
+.other .calc { font-size: 12px; padding: 4px 8px; }
+
+footer { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 16px; }
+footer p { margin: 0 0 4px; }
+
+@media (max-width: 640px) {
+  .core-body { grid-template-columns: minmax(0, 1fr); }
+  .figure-box svg { max-width: 210px; }
+  .others-grid { grid-template-columns: minmax(0, 1fr); }
+  form, .detail { padding: 18px; }
+  .person { grid-template-columns: minmax(0, 1fr); }
+  .person > div + div { border-left: 0; border-top: 1px solid var(--line); padding-left: 4px; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { animation: rise .5s ease-out both; }
+  @keyframes rise { from { transform: translateY(8px); opacity: .4; } to { transform: none; opacity: 1; } }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">NUMEROLOGY CALCULATOR</p>
+    <h1>数秘術 鑑定計算機</h1>
+    <p class="lead">生年月日と、お名前のローマ字を入力して「鑑定する」を押してください。あなたの基本となる3つの数と、その意味を表示します。</p>
+  </header>
+
+  <form id="form" novalidate>
+    <div class="field">
+      <label for="name">お名前（ローマ字）</label>
+      <input type="text" id="name" name="name" autocomplete="off" placeholder="例：TARO YAMADA" maxlength="60">
+      <p class="hint">パスポートと同じ表記がおすすめです。姓と名の間はスペースで区切ってください。</p>
+    </div>
+    <div class="field">
+      <span class="label" id="birth-label">生年月日</span>
+      <div class="date-row" role="group" aria-labelledby="birth-label">
+        <label for="year">年<select id="year" name="year"></select></label>
+        <label for="month">月<select id="month" name="month"></select></label>
+        <label for="day">日<select id="day" name="day"></select></label>
+      </div>
+    </div>
+    <p class="error" id="error" role="alert" hidden></p>
+    <div class="actions">
+      <button type="submit" class="btn-primary">鑑定する</button>
+      <button type="button" class="btn-ghost" id="reset">クリア</button>
+    </div>
+  </form>
+
+  <section id="result" aria-live="polite"></section>
+
+  <footer>
+    <p>計算方法：ピタゴラス式（A=1, B=2 … I=9, J=1 … の表）。マスターナンバー 11・22・33 はそのまま残します。</p>
+    <p>ソウル数は母音（A・E・I・O・U）、パーソナリティ数は子音から計算します。Y は子音として扱います。</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ===== 数の意味 ===== */
+  var MEANINGS = {
+    1: { key: "始まり・リーダーシップ", text: "自分の意志で道を切りひらく、パイオニアの数です。決断が早く、まだ誰もやっていないことに挑む勇気があります。人に合わせるより、自分が先頭に立つことで力を発揮します。", strengths: ["行動力", "独立心", "決断力"], challenge: "強さが頑固さに変わりやすいので、人の意見を聞く余裕を持つとさらに伸びます。" },
+    2: { key: "調和・協力", text: "人と人をつなぎ、場をやわらかく整える数です。相手の気持ちを細やかに感じ取り、サポート役として大きな力を発揮します。争いを好まず、穏やかな関係を大切にします。", strengths: ["共感力", "協調性", "気配り"], challenge: "相手を優先しすぎて自分の本音を飲み込みがちです。小さな「ノー」を言う練習を。" },
+    3: { key: "創造・表現・楽しさ", text: "明るさと遊び心で周りを楽しませる、表現の数です。話す・書く・描くなど、自分を表に出すことで輝きます。好奇心が強く、発想が豊かです。", strengths: ["表現力", "社交性", "ユーモア"], challenge: "興味が移りやすく、物事が中途半端になりがち。ひとつをやり遂げる経験が自信になります。" },
+    4: { key: "安定・誠実・努力", text: "コツコツと土台を築く、堅実な数です。約束を守り、計画どおりに物事を進める力があります。周りからの信頼が厚く、長く続く成果を生み出します。", strengths: ["忍耐力", "まじめさ", "計画性"], challenge: "変化を怖がりすぎると窮屈になります。ときには予定外の出来事を楽しんでみましょう。" },
+    5: { key: "自由・変化・冒険", text: "新しい経験を求めて動き続ける、自由の数です。適応力が高く、変化の多い環境ほど生き生きとします。五感が鋭く、人を惹きつける魅力があります。", strengths: ["適応力", "好奇心", "行動の速さ"], challenge: "刺激を求めて飽きっぽくなることも。自分で決めた軸をひとつ持つと安定します。" },
+    6: { key: "愛・責任・奉仕", text: "家族や仲間を大切にし、人の役に立つことに喜びを感じる数です。面倒見がよく、美しいものや心地よい空間をつくるセンスがあります。", strengths: ["思いやり", "責任感", "美的センス"], challenge: "世話を焼きすぎて相手の自立を妨げることも。自分自身を満たすことも忘れずに。" },
+    7: { key: "探究・分析・精神性", text: "物事の本質を深く知ろうとする、探究者の数です。一人の時間で考えを深め、専門的な分野で力を発揮します。直感と論理の両方を備えています。", strengths: ["分析力", "集中力", "洞察力"], challenge: "心の内を見せないため、誤解されることがあります。信頼できる人には気持ちを言葉にしてみて。" },
+    8: { key: "力・豊かさ・達成", text: "大きな目標を現実のものにする、実力の数です。経済感覚に優れ、組織を動かす統率力があります。努力が目に見える成果につながりやすい人です。", strengths: ["実行力", "統率力", "経済感覚"], challenge: "結果を求めるあまり、仕事中心になりがちです。人との温かいつながりが力の源になります。" },
+    9: { key: "博愛・完成・包容力", text: "広い視野と深い優しさを持つ、完成の数です。国や立場を越えて人を理解し、多くの人のために動けます。芸術的な感受性も豊かです。", strengths: ["包容力", "理想の高さ", "感受性"], challenge: "人の痛みを背負い込みやすい面があります。手放すこと、終わらせることも大切な力です。" },
+    11: { key: "直感・インスピレーション", text: "鋭い直感とひらめきを持つマスターナンバーです。目に見えないものを感じ取る力があり、人に気づきや希望を与える役割を持ちます。2の性質（調和・共感）もあわせ持ちます。", strengths: ["直感力", "感受性", "人を照らす力"], challenge: "感覚が鋭いぶん緊張しやすく、疲れやすい面も。心と体を休める時間を意識しましょう。" },
+    22: { key: "大きな構想を形にする", text: "大きな理想を現実の形にする力を持つマスターナンバーです。ビジョンと実務力を兼ね備え、社会に残る仕事を成し遂げる可能性があります。4の性質（堅実さ）もあわせ持ちます。", strengths: ["構想力", "実現力", "スケールの大きさ"], challenge: "背負う期待が大きく、プレッシャーを感じやすい数。一歩ずつ進めば大丈夫です。" },
+    33: { key: "無償の愛・癒し", text: "見返りを求めない大きな愛を表すマスターナンバーです。そこにいるだけで人を安心させ、癒やす力があります。6の性質（愛と責任）もあわせ持ちます。", strengths: ["慈愛", "癒しの力", "独創性"], challenge: "人に尽くしすぎて自分が空っぽになりがちです。受け取ることも愛のひとつです。" }
+  };
+
+  var TYPES = {
+    life:        { name: "ライフパス数", where: "生年月日から", about: "人生全体を通して歩む道と、大きなテーマを表します。" },
+    destiny:     { name: "ディスティニー数", where: "名前の全文字から", about: "生まれ持った才能と、社会の中で果たす役割を表します。" },
+    soul:        { name: "ソウル数", where: "名前の母音から", about: "心の奥にある本当の願い、あなたを動かす原動力を表します。" },
+    personality: { name: "パーソナリティ数", where: "名前の子音から", about: "周りの人から見たあなたの第一印象です。" },
+    birthday:    { name: "バースデー数", where: "生まれた日から", about: "日常の中で自然に発揮される特技です。" },
+    maturity:    { name: "マチュリティ数", where: "ライフパス数＋ディスティニー数", about: "人生の後半に花ひらく、成熟したテーマです。" }
+  };
+
+  /* ===== 計算 ===== */
+  var VOWELS = "AEIOU";
+  function letterValue(ch) { return ((ch.charCodeAt(0) - 65) % 9) + 1; }
+  function digitSum(n) { return String(n).split("").reduce(function (a, d) { return a + Number(d); }, 0); }
+  function isMaster(n) { return n === 11 || n === 22 || n === 33; }
+  // 1桁かマスターナンバーになるまで足し続け、途中経過も返す
+  function reduce(n, keepMaster) {
+    var steps = [n];
+    while (n > 9 && !(keepMaster && isMaster(n))) {
+      n = digitSum(n);
+      steps.push(n);
+    }
+    return { value: n, steps: steps };
+  }
+  function stepsText(steps) {
+    var out = [];
+    for (var i = 1; i < steps.length; i++) {
+      out.push(String(steps[i - 1]).split("").join("+") + "=" + steps[i]);
+    }
+    return out.length ? " → " + out.join(" → ") : "";
+  }
+
+  function normalizeName(raw) {
+    return (raw || "").normalize("NFKC").toUpperCase().replace(/[^A-Z ]+/g, " ").replace(/\s+/g, " ").trim();
+  }
+
+  function calc(name, y, m, d) {
+    var digits = (String(y) + String(m).padStart(2, "0") + String(d).padStart(2, "0")).split("").map(Number);
+    var lifeSum = digits.reduce(function (a, b) { return a + b; }, 0);
+    var life = reduce(lifeSum, true);
+
+    var letters = name.split("").map(function (ch) {
+      if (ch === " ") return { ch: ch, space: true };
+      return { ch: ch, v: letterValue(ch), vowel: VOWELS.indexOf(ch) >= 0 };
+    });
+    var real = letters.filter(function (l) { return !l.space; });
+    var sumOf = function (arr) { return arr.reduce(function (a, l) { return a + l.v; }, 0); };
+    var allSum = sumOf(real);
+    var vowelL = real.filter(function (l) { return l.vowel; });
+    var consL = real.filter(function (l) { return !l.vowel; });
+    var vowelSum = sumOf(vowelL), consSum = sumOf(consL);
+
+    var destiny = reduce(allSum, true);
+    var soul = reduce(vowelSum, true);
+    var personality = reduce(consSum, true);
+    var birthday = reduce(d, true);
+    var matSum = life.value + destiny.value;
+    var maturity = reduce(matSum, true);
+
+    return {
+      letters: letters,
+      life: { value: life.value, calc: digits.join("+") + "=" + lifeSum + stepsText(life.steps) },
+      destiny: { value: destiny.value, calc: "全文字の合計 " + allSum + stepsText(destiny.steps) },
+      soul: { value: soul.value, calc: vowelL.length ? "母音 " + vowelL.map(function (l) { return l.ch + "(" + l.v + ")"; }).join("+") + "=" + vowelSum + stepsText(soul.steps) : "母音なし" },
+      personality: { value: personality.value, calc: "子音の合計 " + consSum + stepsText(personality.steps) },
+      birthday: { value: birthday.value, calc: d + "日" + stepsText(birthday.steps) },
+      maturity: { value: maturity.value, calc: life.value + "+" + destiny.value + "=" + matSum + stepsText(maturity.steps) }
+    };
+  }
+
+  /* ===== 表示 ===== */
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; });
+  }
+
+  function figureSVG(r) {
+    // オリジナルの人物図：頭上の光輪＝ディスティニー数、胸＝ソウル数、足元の道＝ライフパス数
+    return '' +
+    '<svg viewBox="0 0 240 340" role="img" aria-label="人物図：頭上にディスティニー数 ' + r.destiny.value + '、胸にソウル数 ' + r.soul.value + '、足元にライフパス数 ' + r.life.value + '">' +
+      '<circle class="fig-star" cx="34" cy="58" r="2.5"/><circle class="fig-star" cx="206" cy="40" r="2"/>' +
+      '<circle class="fig-star" cx="198" cy="112" r="1.6"/><circle class="fig-star" cx="46" cy="134" r="1.6"/>' +
+      '<circle class="fig-star" cx="214" cy="190" r="2"/><circle class="fig-star" cx="24" cy="214" r="2"/>' +
+      '<ellipse class="fig-ground" cx="120" cy="284" rx="92" ry="13"/>' +
+      '<path class="fig-path" d="M120 290 C 120 304, 96 308, 88 318 S 92 336, 108 338"/>' +
+      '<circle class="fig-halo" cx="120" cy="66" r="44"/>' +
+      '<path class="fig-arm" d="M98 116 Q 70 150 58 198"/>' +
+      '<path class="fig-arm" d="M142 116 Q 170 150 182 198"/>' +
+      '<circle class="fig-deep" cx="57" cy="203" r="9"/><circle class="fig-deep" cx="183" cy="203" r="9"/>' +
+      '<path class="fig-body" d="M120 102 C 104 102 92 106 88 116 L 66 270 Q 120 290 174 270 L 152 116 C 148 106 136 102 120 102 Z"/>' +
+      '<rect class="fig-deep" x="112" y="92" width="16" height="14" rx="4"/>' +
+      '<circle class="fig-body" cx="120" cy="66" r="29"/>' +
+      '<circle class="fig-heart-glow" cx="120" cy="156" r="30"/>' +
+      '<circle class="badge-destiny" cx="120" cy="20" r="19"/><text class="badge-num" x="120" y="21">' + r.destiny.value + '</text>' +
+      '<circle class="badge-soul" cx="120" cy="156" r="19"/><text class="badge-num" x="120" y="157">' + r.soul.value + '</text>' +
+      '<circle class="badge-life" cx="120" cy="296" r="19"/><text class="badge-num" x="120" y="297">' + r.life.value + '</text>' +
+    '</svg>';
+  }
+
+  function coreItem(k, r) {
+    var t = TYPES[k], m = MEANINGS[r[k].value];
+    return '<li class="core-item" data-k="' + k + '">' +
+      '<div class="core-num">' + r[k].value + '</div>' +
+      '<div><p class="core-where">' + esc(t.where) + '</p><p class="core-name">' + esc(t.name) + '</p>' +
+      '<p class="core-key">' + esc(m.key) + '</p></div></li>';
+  }
+
+  function detail(k, r, extra) {
+    var t = TYPES[k], v = r[k].value, m = MEANINGS[v];
+    return '<article class="detail" data-k="' + k + '">' +
+      '<div class="detail-head"><div class="detail-num">' + v + '</div>' +
+      '<div><p class="detail-title">' + esc(t.name) + '　' + v + (isMaster(v) ? ' <span class="master">MASTER NUMBER</span>' : '') + '</p>' +
+      '<p class="detail-sub">' + esc(t.about) + '</p></div></div>' +
+      (extra || '') +
+      '<div class="calc">計算：' + esc(r[k].calc) + '</div>' +
+      '<h4>' + esc(m.key) + '</h4>' +
+      '<p>' + esc(m.text) + '</p>' +
+      '<ul class="tags">' + m.strengths.map(function (s) { return '<li>' + esc(s) + '</li>'; }).join('') + '</ul>' +
+      '<p class="challenge"><strong>課題</strong>' + esc(m.challenge) + '</p>' +
+    '</article>';
+  }
+
+  function other(k, r) {
+    var t = TYPES[k], v = r[k].value, m = MEANINGS[v];
+    return '<div class="other"><div class="n">' + v + '</div><h3>' + esc(t.name) + '</h3>' +
+      '<p class="hint">' + esc(t.about) + '</p><p><strong>' + esc(m.key) + '</strong></p>' +
+      '<div class="calc">' + esc(r[k].calc) + '</div></div>';
+  }
+
+  function lettersHTML(r) {
+    return '<div class="letters-wrap"><div class="letters" aria-label="名前の各文字と数">' +
+      r.letters.map(function (l) {
+        if (l.space) return '<span class="letter space" aria-hidden="true"></span>';
+        return '<span class="letter' + (l.vowel ? ' vowel' : '') + '"><b>' + l.ch + '</b><span>' + l.v + '</span></span>';
+      }).join('') + '</div></div>' +
+      '<p class="legend"><i></i>色つきは母音（ソウル数に使用）</p>';
+  }
+
+  function render(name, y, m, d, isSample) {
+    var r = calc(name, y, m, d);
+    var el = document.getElementById("result");
+    el.innerHTML =
+      (isSample ? '<p class="sample-note">表示例：TARO YAMADA さん（1990年5月15日生まれ）の場合</p>' : '') +
+      '<section class="core reveal" aria-labelledby="core-h">' +
+        '<h2 id="core-h">あなたの基本となる3つの数は</h2>' +
+        '<div class="core-body">' +
+          '<div class="figure-box">' + figureSVG(r) + '</div>' +
+          '<ol class="core-list">' + coreItem("life", r) + coreItem("destiny", r) + coreItem("soul", r) + '</ol>' +
+        '</div>' +
+      '</section>' +
+      '<dl class="person reveal">' +
+        '<div><dt>お名前</dt><dd>' + esc(name) + '</dd></div>' +
+        '<div><dt>生年月日</dt><dd>' + y + '年' + m + '月' + d + '日</dd></div>' +
+      '</dl>' +
+      '<section class="details reveal" aria-labelledby="detail-h">' +
+        '<h2 id="detail-h">診断結果</h2>' +
+        detail("life", r) +
+        detail("destiny", r, lettersHTML(r)) +
+        detail("soul", r) +
+      '</section>' +
+      '<section class="others reveal" aria-labelledby="others-h">' +
+        '<h2 id="others-h">その他の数</h2>' +
+        '<div class="others-grid">' + other("personality", r) + other("birthday", r) + other("maturity", r) + '</div>' +
+      '</section>';
+  }
+
+  /* ===== フォーム ===== */
+  var form = document.getElementById("form");
+  var nameEl = document.getElementById("name");
+  var yEl = document.getElementById("year"), mEl = document.getElementById("month"), dEl = document.getElementById("day");
+  var errEl = document.getElementById("error");
+
+  function opt(v, label) { var o = document.createElement("option"); o.value = v; o.textContent = label; return o; }
+  var thisYear = new Date().getFullYear();
+  yEl.appendChild(opt("", "----"));
+  for (var yy = thisYear; yy >= 1900; yy--) yEl.appendChild(opt(yy, yy));
+  mEl.appendChild(opt("", "--"));
+  for (var mm = 1; mm <= 12; mm++) mEl.appendChild(opt(mm, mm));
+
+  function fillDays() {
+    var keep = dEl.value;
+    var y = Number(yEl.value) || 2000, m = Number(mEl.value) || 1;
+    var max = new Date(y, m, 0).getDate();
+    dEl.innerHTML = "";
+    dEl.appendChild(opt("", "--"));
+    for (var i = 1; i <= max; i++) dEl.appendChild(opt(i, i));
+    if (keep && Number(keep) <= max) dEl.value = keep;
+  }
+  fillDays();
+  yEl.addEventListener("change", fillDays);
+  mEl.addEventListener("change", fillDays);
+
+  function showError(msg) { errEl.textContent = msg; errEl.hidden = !msg; }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var name = normalizeName(nameEl.value);
+    if (!name) { showError("お名前をローマ字（A〜Z）で入力してください。"); nameEl.focus(); return; }
+    if (!yEl.value || !mEl.value || !dEl.value) { showError("生年月日の年・月・日をすべて選んでください。"); return; }
+    showError("");
+    nameEl.value = name;
+    render(name, Number(yEl.value), Number(mEl.value), Number(dEl.value), false);
+    document.getElementById("result").scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  document.getElementById("reset").addEventListener("click", function () {
+    nameEl.value = ""; yEl.value = ""; mEl.value = ""; fillDays(); dEl.value = "";
+    showError("");
+    render("TARO YAMADA", 1990, 5, 15, true);
+    nameEl.focus();
+  });
+
+  // 初期表示は例として表示
+  render("TARO YAMADA", 1990, 5, 15, true);
+
+  // テスト用に公開
+  window.__numerology = { calc: calc, normalizeName: normalizeName };
+})();
+</script>
+</body>
+</html>

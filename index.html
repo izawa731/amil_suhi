@@ -10,7 +10,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 <style>
 /* Layout: 緑のヘッダー → 昼の森の背景の上に「左：入力フォーム｜右：結果」→ 注意書きとボタン → 緑のフッター
-   結果は上から「基本となる3つの数（過去数・現在数・未来数）」→ Name / Birthday → 人物図と P・LP・S・M・D → 画像で保存 */
+   結果は上から「基本となる3つの数（過去数・現在数・未来数）」→ Name / Birthday → 5つの数（LP・S・D・P・M）→ 画像で保存 */
 :root {
   --night: #1f3d2b;      /* ヘッダー・フッター（深い森の緑） */
   --sky-1: #f4fbe6;
@@ -224,29 +224,33 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 }
 .who-row output:empty::before { content: attr(data-ph); color: var(--ink-muted); }
 
-/* 人物図と5つの数 */
+/* 5つの数（性格・考え方を一番上に横長で、残り4つは2列） */
 .chart {
-  position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 190px minmax(0, 1fr);
-  grid-template-rows: auto auto auto;
-  grid-template-areas:
-    "p   fig lp"
-    ".   fig s"
-    "m   fig d";
-  column-gap: 14px;
-  row-gap: 26px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px 18px;
 }
-.n-box { display: grid; gap: 6px; align-content: start; min-width: 0; position: relative; z-index: 1; }
-.n-box[data-k="P"]  { grid-area: p; margin-top: 60px; }
-.n-box[data-k="LP"] { grid-area: lp; }
-.n-box[data-k="S"]  { grid-area: s; }
-.n-box[data-k="M"]  { grid-area: m; }
-.n-box[data-k="D"]  { grid-area: d; }
+.n-box { display: grid; gap: 6px; align-content: start; min-width: 0; }
+.n-box[data-k="LP"] { grid-column: 1 / -1; }
+.n-box[data-k="LP"] .n-text { min-height: 0; }
 .n-tab { display: flex; align-items: center; gap: 10px; }
+.n-head { display: grid; gap: 0; min-width: 0; }
+.n-name small {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  border: 1px solid var(--line-dark);
+  border-radius: 4px;
+  padding: 0 5px;
+  margin-left: 6px;
+  letter-spacing: .04em;
+  vertical-align: 1px;
+}
+.n-desc { font-size: 11.5px; color: var(--text-muted); letter-spacing: .02em; text-shadow: 0 0 4px rgba(255, 255, 255, .95); }
 .n-num {
-  width: 60px; height: 38px;
-  display: grid; place-items: center;
+  min-width: 60px; height: 38px;
+  padding-inline: 8px;
+  display: flex; align-items: baseline; justify-content: center; padding-top: 8px;
   background: var(--paper-solid);
   color: var(--ink);
   border-radius: 4px;
@@ -256,25 +260,20 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   font-variant-numeric: tabular-nums;
 }
 .n-box.done .n-num { border-bottom-color: var(--future); }
-.n-name { font-size: 14px; font-weight: 500; letter-spacing: .04em; }
+.n-name { font-size: 15px; font-weight: 700; letter-spacing: .04em; }
+.n-num .zoro { font-size: 12px; font-weight: 700; color: var(--ink-muted); margin-left: 1px; }
 .n-text {
   background: var(--paper);
   color: var(--ink);
   border-radius: 4px;
   padding: 10px 12px;
-  min-height: 118px;
+  min-height: 96px;
   font-size: 13px;
   line-height: 1.75;
   letter-spacing: .06em;
   box-shadow: 0 2px 8px rgba(0, 0, 0, .2);
 }
 .n-text .ph { color: var(--ink-muted); font-size: 12px; }
-
-.fig { grid-area: fig; align-self: center; display: grid; justify-items: center; position: relative; z-index: 1; }
-.fig svg { width: 100%; max-width: 190px; height: auto; display: block; }
-#arrows { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; z-index: 2; }
-#arrows line { stroke: var(--title); stroke-width: 2; }
-#arrows path { fill: var(--title); }
 
 /* ---------- 画像で保存 ---------- */
 .export {
@@ -351,14 +350,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   .page-title { justify-self: center; text-align: center; }
 }
 @media (max-width: 640px) {
-  .chart {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "fig" "lp" "s" "d" "p" "m";
-    row-gap: 18px;
-  }
-  .n-box[data-k="P"] { margin-top: 0; }
-  .fig svg { max-width: 150px; }
-  #arrows { display: none; }
+  .chart { grid-template-columns: minmax(0, 1fr); row-gap: 18px; }
   .n-text { min-height: 0; }
   .core-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .core-card { padding: 8px; }
@@ -444,55 +436,11 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
         </div>
 
         <div class="chart" id="chart">
-          <div class="n-box" data-k="LP"><div class="n-tab"><div class="n-num">LP</div><span class="n-name">LP (頭)</span></div><div class="n-text"></div></div>
-          <div class="n-box" data-k="S"><div class="n-tab"><div class="n-num">S</div><span class="n-name">S (心)</span></div><div class="n-text"></div></div>
-          <div class="n-box" data-k="D"><div class="n-tab"><div class="n-num">D</div><span class="n-name">D (体)</span></div><div class="n-text"></div></div>
-          <div class="n-box" data-k="P"><div class="n-tab"><div class="n-num">P</div><span class="n-name">P (見た目)</span></div><div class="n-text"></div></div>
-          <div class="n-box" data-k="M"><div class="n-tab"><div class="n-num">M</div><span class="n-name">M (将来)</span></div><div class="n-text"></div></div>
-
-          <div class="fig">
-            <!-- オリジナルの人物：星のブローチをつけた子ども -->
-            <svg viewBox="0 0 180 300" role="img" aria-label="人物の絵（頭＝LP、心＝S、体＝D）">
-              <!-- 足 -->
-              <rect x="70" y="240" width="16" height="34" rx="6" fill="#ffffff" stroke="#2a2a3a" stroke-width="2.5"/>
-              <rect x="94" y="240" width="16" height="34" rx="6" fill="#ffffff" stroke="#2a2a3a" stroke-width="2.5"/>
-              <path d="M62 276 Q62 266 78 268 L86 270 L86 282 L66 282 Q62 282 62 276 Z" fill="#3b4a8c" stroke="#2a2a3a" stroke-width="2.5"/>
-              <path d="M118 276 Q118 266 102 268 L94 270 L94 282 L114 282 Q118 282 118 276 Z" fill="#3b4a8c" stroke="#2a2a3a" stroke-width="2.5"/>
-              <!-- 腕 -->
-              <path d="M58 148 Q38 178 34 206" fill="none" stroke="#2a2a3a" stroke-width="15" stroke-linecap="round"/>
-              <path d="M58 148 Q38 178 34 206" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
-              <path d="M122 148 Q142 178 146 206" fill="none" stroke="#2a2a3a" stroke-width="15" stroke-linecap="round"/>
-              <path d="M122 148 Q142 178 146 206" fill="none" stroke="#ffffff" stroke-width="10" stroke-linecap="round"/>
-              <!-- 服（ケープつき） -->
-              <path d="M62 138 Q90 128 118 138 L132 246 Q90 258 48 246 Z" fill="#f6efd8" stroke="#2a2a3a" stroke-width="2.5" stroke-linejoin="round"/>
-              <path d="M58 140 Q90 124 122 140 L126 166 Q90 182 54 166 Z" fill="#6f7fd0" stroke="#2a2a3a" stroke-width="2.5" stroke-linejoin="round"/>
-              <path d="M48 246 Q90 258 132 246" fill="none" stroke="#6f7fd0" stroke-width="4"/>
-              <!-- 胸の星 -->
-              <path id="heart-star" d="M90 176 L95.3 188.7 L109 189.6 L98.5 198.4 L101.8 211.8 L90 204.5 L78.2 211.8 L81.5 198.4 L71 189.6 L84.7 188.7 Z" fill="#f2c94c" stroke="#2a2a3a" stroke-width="2" stroke-linejoin="round"/>
-              <!-- 頭 -->
-              <circle cx="90" cy="82" r="50" fill="#ffffff" stroke="#2a2a3a" stroke-width="2.5"/>
-              <!-- 髪（おだんご＋前髪） -->
-              <circle cx="90" cy="26" r="15" fill="#5a3a2a" stroke="#2a2a3a" stroke-width="2.5"/>
-              <path d="M40 84 Q38 34 90 32 Q142 34 140 84 Q130 60 112 56 Q100 68 80 62 Q62 58 50 70 Q44 76 40 84 Z" fill="#5a3a2a" stroke="#2a2a3a" stroke-width="2.5" stroke-linejoin="round"/>
-              <path d="M80 18 L84 24 M100 18 L96 24" stroke="#f2c94c" stroke-width="3" stroke-linecap="round"/>
-              <!-- 顔 -->
-              <path d="M64 92 Q71 84 78 92" fill="none" stroke="#2a2a3a" stroke-width="3" stroke-linecap="round"/>
-              <path d="M102 92 Q109 84 116 92" fill="none" stroke="#2a2a3a" stroke-width="3" stroke-linecap="round"/>
-              <ellipse cx="60" cy="104" rx="7" ry="4" fill="#f4a7b9" opacity=".8"/>
-              <ellipse cx="120" cy="104" rx="7" ry="4" fill="#f4a7b9" opacity=".8"/>
-              <path d="M82 106 Q90 114 98 106" fill="none" stroke="#2a2a3a" stroke-width="2.5" stroke-linecap="round"/>
-              <!-- 矢印の目標（見えない点） -->
-              <circle id="t-head" cx="90" cy="24" r="1" fill="none"/>
-              <circle id="t-heart" cx="98" cy="190" r="1" fill="none"/>
-              <circle id="t-body" cx="104" cy="250" r="1" fill="none"/>
-            </svg>
-          </div>
-          <svg id="arrows" aria-hidden="true">
-            <defs><marker id="ah" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z"/></marker></defs>
-            <line id="ar-LP" marker-end="url(#ah)"/>
-            <line id="ar-S" marker-end="url(#ah)"/>
-            <line id="ar-D" marker-end="url(#ah)"/>
-          </svg>
+          <div class="n-box" data-k="LP"><div class="n-tab"><div class="n-num">LP</div><div class="n-head"><span class="n-name">性格・考え方<small>LP</small></span><span class="n-desc">生年月日から。あなたの基本の性格と考え方</span></div></div><div class="n-text"></div></div>
+          <div class="n-box" data-k="S"><div class="n-tab"><div class="n-num">S</div><div class="n-head"><span class="n-name">心の願い・好き嫌い<small>S</small></span><span class="n-desc">名前の母音から。心の奥で望んでいること</span></div></div><div class="n-text"></div></div>
+          <div class="n-box" data-k="D"><div class="n-tab"><div class="n-num">D</div><div class="n-head"><span class="n-name">行動・役割<small>D</small></span><span class="n-desc">名前の全部の文字から。行動のしかたと役割</span></div></div><div class="n-text"></div></div>
+          <div class="n-box" data-k="P"><div class="n-tab"><div class="n-num">P</div><div class="n-head"><span class="n-name">第一印象・見た目<small>P</small></span><span class="n-desc">名前の子音から。周りから見たあなたの印象</span></div></div><div class="n-text"></div></div>
+          <div class="n-box" data-k="M"><div class="n-tab"><div class="n-num">M</div><div class="n-head"><span class="n-name">将来のテーマ<small>M</small></span><span class="n-desc">性格と行動の数から。これから花ひらくこと</span></div></div><div class="n-text"></div></div>
         </div>
 
         <section class="export" aria-labelledby="export-h">
@@ -612,6 +560,16 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   // 1桁か 11・22・33 になるまで各桁を足す
   function reduce(n) { while (n > 9 && !isMaster(n)) n = digitSum(n); return n; }
   function sumDigits(str) { return digitSum(str.replace(/\D/g, "")); }
+  // 足していく途中で通ったゾロ目（44・55・66・77・88・99）を返す。なければ null
+  function zorome(n) {
+    while (n > 9 && !isMaster(n)) {
+      if (n >= 44 && n <= 99 && n % 11 === 0) return n;
+      n = digitSum(n);
+    }
+    return null;
+  }
+  // 表示用：「5(77)」のように、1桁の数のあとにゾロ目を添える
+  function withZoro(v, z) { return v === null ? "-" : z ? v + "(" + z + ")" : String(v); }
 
   function normalizeName(raw) {
     return (raw || "").normalize("NFKC").toUpperCase().replace(/[^A-Z]+/g, " ").replace(/\s+/g, " ").trim();
@@ -625,9 +583,17 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       all += v;
       if (VOWELS.indexOf(ch) >= 0) { vowel += v; hasVowel = true; } else { cons += v; hasCons = true; }
     });
-    var LP = reduce(sumDigits(String(y) + m + d));
+    var lpSum = sumDigits(String(y) + m + d);
+    var LP = reduce(lpSum);
     var D = reduce(all);
     return {
+      zoro: {
+        LP: zorome(lpSum),
+        D: zorome(all),
+        S: hasVowel ? zorome(vowel) : null,
+        P: hasCons ? zorome(cons) : null,
+        M: zorome(LP + D)
+      },
       LP: LP,
       D: D,
       S: hasVowel ? reduce(vowel) : null,
@@ -657,12 +623,11 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
         box.classList.remove("done");
         txt.innerHTML = '<span class="ph">' + (k === "S" ? "名前に母音（A・E・I・O・U）がないため計算できません。" : "名前に子音がないため計算できません。") + "</span>";
       } else {
-        num.textContent = v;
+        num.innerHTML = v + (r.zoro[k] ? '<span class="zoro">(' + r.zoro[k] + ')</span>' : "");
         box.classList.add("done");
         txt.textContent = TEXTS[k][v];
       }
     });
-    drawArrows();
     r.name = name;
     r.birthText = y + "年" + m + "月" + d + "日生まれ";
     lastResult = r;
@@ -670,28 +635,6 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     imgOut.hidden = true;
     imgMsg.textContent = "";
   }
-
-  /* ===== 矢印（ボックス → 頭・心・体） ===== */
-  function drawArrows() {
-    var chart = document.getElementById("chart");
-    var svg = document.getElementById("arrows");
-    if (getComputedStyle(svg).display === "none") return;
-    var cr = chart.getBoundingClientRect();
-    [["LP", "t-head"], ["S", "t-heart"], ["D", "t-body"]].forEach(function (pair) {
-      var tab = chart.querySelector('.n-box[data-k="' + pair[0] + '"] .n-num').getBoundingClientRect();
-      var t = document.getElementById(pair[1]).getBoundingClientRect();
-      var line = document.getElementById("ar-" + pair[0]);
-      var x1 = tab.left - cr.left - 4, y1 = (pair[0] === "LP" ? tab.top : pair[0] === "D" ? tab.top : tab.top + tab.height / 2) - cr.top;
-      var x2 = t.left + t.width / 2 - cr.left, y2 = t.top + t.height / 2 - cr.top;
-      // 体にめり込まないよう、少し手前で止める
-      var dx = x2 - x1, dy = y2 - y1, len = Math.hypot(dx, dy) || 1, cut = pair[0] === "S" ? 6 : 10;
-      line.setAttribute("x1", x1); line.setAttribute("y1", y1);
-      line.setAttribute("x2", x2 - dx / len * cut); line.setAttribute("y2", y2 - dy / len * cut);
-    });
-  }
-  window.addEventListener("resize", drawArrows);
-  if (document.fonts && document.fonts.ready) document.fonts.ready.then(drawArrows);
-  window.addEventListener("load", drawArrows);
 
   /* ===== フォーム ===== */
   var form = document.getElementById("form");
@@ -968,6 +911,8 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   var IMG_W = 1080, IMG_H = 1350;
   var FONT_G = '"Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif';
   var FONT_M = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif';
+  // 画像のカードの見出し（ページの見出しと同じ言葉）
+  var LABELS = { P: "第一印象・見た目", LP: "性格・考え方", S: "心の願い・好き嫌い", M: "将来のテーマ", D: "行動・役割" };
   var COLORS = { past: "#e0245e", present: "#e3c81e", future: "#f0a12f", num: "#2f5a2c", ink: "#26371f", muted: "#4a5c40" };
   var lastResult = null;
 
@@ -1020,7 +965,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   function buildImage(r) {
     var fairy = FAIRIES[r.LP];
     var strings = ["数秘自動計算 あなたの数秘カード", r.name, r.birthText, fairy.name, fairy.catch, "過去数現在数未来数生年月日の日月日",
-      "P（見た目）LP（頭）S（心）M（将来）D（体）・-計算できません母音子音がないため", "Numerology - 数秘自動計算 -"];
+      "第一印象・見た目性格・考え方心の願い・好き嫌い将来のテーマ行動・役割PLSMD()・-計算できません母音子音がないため", "Numerology - 数秘自動計算 -"];
     ["P", "LP", "S", "M", "D"].forEach(function (k) { if (r[k] !== null) strings.push(TEXTS[k][r[k]]); });
     [r.past, r.present, r.future].forEach(function (v) { strings.push(SHORT[v]); });
     var all = strings.join("") + "0123456789";
@@ -1068,28 +1013,53 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       ctx.font = "700 26px " + FONT_G; glowText(ctx, "「" + fairy.catch + "」", 540, 942, COLORS.ink);
 
       // 周りの5つの数
-      function sideCard(k, label, x, y) {
+      // 数字。ゾロ目があれば「8(44)」のように小さく添える
+      function drawNum(v, z, x, base, size, align) {
+        var main = v === null ? "-" : String(v), sub = z ? "(" + z + ")" : "";
+        ctx.textAlign = "left"; ctx.fillStyle = COLORS.num;
+        ctx.font = "700 " + Math.round(size * 0.4) + "px " + FONT_G; var sw = ctx.measureText(sub).width;
+        ctx.font = "700 " + size + "px " + FONT_G; var mw = ctx.measureText(main).width;
+        var left = align === "right" ? x - mw - (sub ? sw + 4 : 0) : x;
+        ctx.fillText(main, left, base);
+        if (sub) { ctx.font = "700 " + Math.round(size * 0.4) + "px " + FONT_G; ctx.fillText(sub, left + mw + 4, base); }
+      }
+      // 見出し（大きめ）と記号（小さな枠つき）
+      function drawLabel(k, x, y, maxW) {
+        ctx.textAlign = "left"; ctx.fillStyle = COLORS.ink;
+        fitFont(ctx, LABELS[k], "700", 25, FONT_G, maxW);
+        ctx.fillText(LABELS[k], x, y);
+      }
+      function drawBadge(k, x, y) {
+        ctx.font = "700 17px " + FONT_G; ctx.textAlign = "left";
+        var w = ctx.measureText(k).width + 16;
+        rrect(ctx, x, y - 19, w, 26, 6); ctx.strokeStyle = COLORS.muted; ctx.lineWidth = 1.5; ctx.stroke();
+        ctx.fillStyle = COLORS.muted; ctx.fillText(k, x + 8, y);
+      }
+      // 周りの4つの数
+      function sideCard(k, x, y) {
         var w = 290, h = 250, v = r[k];
         card(ctx, x, y, w, h, null);
-        ctx.textAlign = "left"; ctx.fillStyle = COLORS.ink; ctx.font = "700 25px " + FONT_G; ctx.fillText(label, x + 20, y + 42);
-        ctx.textAlign = "right"; ctx.fillStyle = COLORS.num; ctx.font = "700 66px " + FONT_G; ctx.fillText(v === null ? "-" : v, x + w - 20, y + 76);
-        ctx.strokeStyle = "#cfe3c0"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 20, y + 96); ctx.lineTo(x + w - 20, y + 96); ctx.stroke();
+        drawLabel(k, x + 20, y + 42, w - 40);
+        drawBadge(k, x + 20, y + 88);
+        drawNum(v, r.zoro[k], x + w - 20, y + 108, 62, "right");
+        ctx.strokeStyle = "#cfe3c0"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 20, y + 124); ctx.lineTo(x + w - 20, y + 124); ctx.stroke();
         ctx.textAlign = "left"; ctx.fillStyle = COLORS.ink;
-        drawLines(ctx, keywordLines(ctx, k, v, w - 40, 4, 21), x + 20, y + 132, 31);
+        drawLines(ctx, keywordLines(ctx, k, v, w - 40, 3, 21), x + 20, y + 158, 30);
       }
-      sideCard("P", "P（見た目）", 30, 396);
-      sideCard("M", "M（将来）", 30, 666);
-      sideCard("LP", "LP（頭）", 760, 396);
-      sideCard("S", "S（心）", 760, 666);
+      sideCard("P", 30, 396);
+      sideCard("M", 30, 666);
+      sideCard("LP", 760, 396);
+      sideCard("S", 760, 666);
 
-      // D は下の横長カード
+      // 行動・役割（D）は下の横長カード
       var dx = 190, dy = 978, dw = 700, dh = 196;
       card(ctx, dx, dy, dw, dh, null);
-      ctx.textAlign = "left"; ctx.fillStyle = COLORS.ink; ctx.font = "700 25px " + FONT_G; ctx.fillText("D（体）", dx + 28, dy + 50);
-      ctx.fillStyle = COLORS.num; ctx.font = "700 76px " + FONT_G; ctx.fillText(r.D, dx + 28, dy + 140);
-      ctx.strokeStyle = "#cfe3c0"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(dx + 190, dy + 26); ctx.lineTo(dx + 190, dy + dh - 26); ctx.stroke();
-      ctx.fillStyle = COLORS.ink;
-      drawLines(ctx, keywordLines(ctx, "D", r.D, dw - 250, 4, 22), dx + 216, dy + 56, 34);
+      drawLabel("D", dx + 28, dy + 48, 170);
+      drawBadge("D", dx + 28, dy + 88);
+      drawNum(r.D, r.zoro.D, dx + 28, dy + 164, 70, "left");
+      ctx.strokeStyle = "#cfe3c0"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(dx + 210, dy + 26); ctx.lineTo(dx + 210, dy + dh - 26); ctx.stroke();
+      ctx.textAlign = "left"; ctx.fillStyle = COLORS.ink;
+      drawLines(ctx, keywordLines(ctx, "D", r.D, dw - 260, 4, 22), dx + 236, dy + 56, 34);
 
       // フッター
       ctx.textAlign = "center"; ctx.font = "italic 600 22px " + FONT_M; glowText(ctx, "Numerology - 数秘自動計算 -", 540, 1300, COLORS.muted);

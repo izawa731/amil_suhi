@@ -35,6 +35,7 @@
   --future: #f0a12f;
   --cta-1: #a6e6e3;
   --cta-2: #f3d58f;
+  --cta-strong: #c4621c;  /* 予約ボタン */
   --f-title: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
   --f-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
   color-scheme: light;
@@ -297,6 +298,37 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 }
 .n-text .ph { color: var(--ink-muted); font-size: 12px; }
 
+/* ---------- セッションへの案内 ---------- */
+.offer {
+  background: rgba(255, 255, 255, .92);
+  border: 2px solid var(--title);
+  border-radius: 14px;
+  padding: 22px 22px 24px;
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  text-align: center;
+}
+.offer h2 { margin: 0; font-family: var(--f-title); font-size: 21px; line-height: 1.5; color: var(--title); text-wrap: balance; }
+.offer-lead { margin: 0; max-width: 46ch; font-size: 13.5px; color: var(--text); }
+.offer-list { margin: 2px 0 6px; padding: 0; list-style: none; display: grid; gap: 4px; text-align: left; font-size: 13.5px; color: var(--text); }
+.offer-list li { padding-left: 1.4em; text-indent: -1.4em; }
+.offer-list li::before { content: "✓"; color: var(--title); font-weight: 700; display: inline-block; width: 1.4em; text-indent: 0; }
+.offer-btn {
+  display: inline-block;
+  background: var(--cta-strong);
+  color: var(--white);
+  font-weight: 700;
+  font-size: 16px;
+  letter-spacing: .1em;
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 12px 34px;
+  box-shadow: 0 3px 10px rgba(120, 60, 10, .3);
+}
+.offer-btn:hover { filter: brightness(1.08); }
+.offer-btn.small { font-size: 14px; padding: 9px 22px; letter-spacing: .06em; }
+
 /* ---------- 画像で保存 ---------- */
 .export {
   background: rgba(255, 255, 255, .8);
@@ -355,7 +387,6 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   letter-spacing: .06em;
   border: 2px solid var(--white);
 }
-.cta.learn { background: var(--cta-1); }
 .cta.session { background: var(--cta-2); }
 .cta:hover { filter: brightness(1.06); }
 
@@ -393,7 +424,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       <path d="M22 7 L24.6 18.6 L36 22 L24.6 25.4 L22 37 L19.4 25.4 L8 22 L19.4 18.6 Z" fill="#e7c36a"/>
       <circle cx="33" cy="11" r="1.6" fill="#e7c36a"/><circle cx="10" cy="33" r="1.2" fill="#e7c36a"/>
     </svg>
-    <p class="site-name">Numerology - 数秘自動計算 -</p>
+    <p class="site-name" data-shop>Numerology - 数秘自動計算 -</p>
   </div>
 </header>
 
@@ -432,7 +463,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
           <p class="error" id="error" role="alert" hidden></p>
           <button type="submit" class="submit">鑑定する</button>
         </form>
-        <p class="privacy">※入力された氏名と生年月日は、このページの中で数秘の計算にだけ使います。計算はお使いの端末の中で行われ、どこにも送信・保存されません。</p>
+        <p class="privacy" id="privacy">※入力された氏名と生年月日は、このページの中で数秘の計算にだけ使います。計算はお使いの端末の中で行われ、どこにも送信・保存されません。</p>
       </div>
 
       <!-- 右：結果 -->
@@ -462,6 +493,14 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
           <div class="n-box" data-k="M"><div class="n-tab"><div class="n-num">M</div><div class="n-head"><span class="n-name">将来のテーマ<small>M</small></span><span class="n-desc">性格と行動の数から。これから花ひらくこと</span></div></div><div class="n-text"></div></div>
         </div>
 
+        <!-- セッションへの案内（鑑定後に表示。文言は A/B で切り替え） -->
+        <section class="offer" id="offer" aria-labelledby="offer-h" hidden>
+          <h2 id="offer-h"></h2>
+          <p class="offer-lead" id="offer-lead"></p>
+          <ul class="offer-list" id="offer-list"></ul>
+          <a class="offer-btn" data-cta="result" href="#" target="_blank" rel="noopener">セッションを予約する</a>
+        </section>
+
         <section class="export" aria-labelledby="export-h">
           <h2 id="export-h">鑑定結果を画像で保存</h2>
           <p>あなたのイメージキャラクター（森の妖精）を真ん中に、すべての数とキーワードを1枚の画像（1080×1350）にまとめます。キャラクターは現在数で決まります。</p>
@@ -471,6 +510,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
             <img id="img-preview" alt="鑑定結果の画像">
             <a class="save" id="img-save" href="#" download="numerology.png">画像を保存</a>
             <p class="img-hint">スマホでは、画像を長押しして保存することもできます。</p>
+            <a class="offer-btn small" data-cta="image" href="#" target="_blank" rel="noopener">この結果をセッションでくわしく聞く</a>
           </div>
         </section>
 
@@ -522,20 +562,75 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     <div class="after">
       <p class="caution">※他の数字との組み合わせによって読み解き方は変わります。くわしい鑑定をご希望の方は、鑑定士によるセッションをおすすめします。</p>
       <div class="cta-row">
-        <a class="cta learn" href="#">数秘を学ぶ</a>
-        <a class="cta session" href="#">セッションに申込む</a>
+        <a class="cta session" data-cta="bottom" href="#" target="_blank" rel="noopener">セッションを予約する</a>
       </div>
     </div>
   </div>
 </main>
 
 <footer class="site-footer gutter">
-  <div class="inner"><p>© 2026 Numerology - 数秘自動計算 -</p></div>
+  <div class="inner"><p>© 2026 <span data-shop>Numerology - 数秘自動計算 -</span></p></div>
 </footer>
 
 <script>
 (function () {
   "use strict";
+
+  /* ================================================================
+     設定（ここを書き換えれば反映されます）
+     ================================================================ */
+  var CONFIG = {
+    // セッションの予約ページの URL（STORES・BASE・coconala など）
+    bookingUrl: "",
+    // ヘッダー・フッターに出すお店の名前
+    shopName: "Numerology - 数秘自動計算 -",
+    // 保存用の画像の一番下に入れる文字（空ならお店の名前）。例："note @your_account で無料鑑定"
+    imageFooter: "",
+    // Google アナリティクス（GA4）の測定 ID。例："G-XXXXXXXXXX"。空なら何も送信しません
+    gaId: "",
+    // A/B テストをするか（false なら全員 A を表示）
+    abTest: true,
+    // 「セッションでわかること」（仮の文章です。自由に書き換えてください）
+    sessionPoints: [
+      "8つの数字の組み合わせから、あなただけの読み解き",
+      "いまの悩みや迷いに合わせたアドバイス",
+      "これからの流れと、動きやすい時期"
+    ]
+  };
+
+  /* ===== A/B の振り分け・計測 ===== */
+  var params = new URLSearchParams(location.search);
+  // どの note 記事から来たか（記事のリンクに ?from=note1 のように付ける）
+  var FROM = (params.get("from") || "direct").replace(/[^\w-]/g, "").slice(0, 40) || "direct";
+  function pickVariant() {
+    if (!CONFIG.abTest) return "A";
+    var q = (params.get("ab") || "").toUpperCase();
+    var v = q === "A" || q === "B" ? q : null;
+    try { if (!v) v = localStorage.getItem("numerology_ab"); } catch (e) {}
+    if (v !== "A" && v !== "B") v = Math.random() < 0.5 ? "A" : "B";
+    try { localStorage.setItem("numerology_ab", v); } catch (e) {}
+    return v;
+  }
+  var VARIANT = pickVariant();
+
+  // GA4 に送るのは「何をしたか」と A/B・来た記事だけ（名前・生年月日は送らない）
+  window.__events = [];
+  if (CONFIG.gaId) {
+    var gs = document.createElement("script");
+    gs.async = true;
+    gs.src = "https://www.googletagmanager.com/gtag/js?id=" + encodeURIComponent(CONFIG.gaId);
+    document.head.appendChild(gs);
+    window.dataLayer = window.dataLayer || [];
+    window.gtag = function () { window.dataLayer.push(arguments); };
+    window.gtag("js", new Date());
+    window.gtag("config", CONFIG.gaId);
+  }
+  function track(name, extra) {
+    var data = { variant: VARIANT, from_article: FROM };
+    if (extra) Object.keys(extra).forEach(function (k) { data[k] = extra[k]; });
+    window.__events.push([name, data]);
+    if (CONFIG.gaId && window.gtag) window.gtag("event", name, data);
+  }
 
   /* ===== 各数の意味（キーワード） =====
      P＝見た目、LP＝頭（性格・考え方）、D＝体（行動・役割）、M＝将来、S＝心（望み・好き嫌い） */
@@ -739,6 +834,42 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     imgMsg.textContent = "";
   }
 
+  /* ===== セッションへの案内 ===== */
+  function bookingHref(position) {
+    if (!CONFIG.bookingUrl) return "#";
+    return CONFIG.bookingUrl + (CONFIG.bookingUrl.indexOf("?") >= 0 ? "&" : "?") +
+      "utm_source=numerology&utm_medium=" + position + "&utm_campaign=ab_" + VARIANT + "&utm_content=" + FROM;
+  }
+  document.querySelectorAll("[data-cta]").forEach(function (a) {
+    var pos = a.getAttribute("data-cta");
+    a.href = bookingHref(pos);
+    if (!CONFIG.bookingUrl) a.removeAttribute("target");
+    a.addEventListener("click", function (e) {
+      track("cta_click", { position: pos });
+      if (!CONFIG.bookingUrl) e.preventDefault();
+    });
+  });
+  document.getElementById("offer-list").innerHTML = CONFIG.sessionPoints.map(function (t) {
+    return "<li>" + t.replace(/[&<>]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]; }) + "</li>";
+  }).join("");
+  function showOffer(r) {
+    // A：シンプルな案内　B：その人の数字を入れた案内
+    if (VARIANT === "B") {
+      setText("offer-h", "あなたの「現在数 " + r.present + " × 未来数 " + r.future + "」を、くわしく読み解きます");
+      setText("offer-lead", "8つの数字は、組み合わせによって意味が変わります。セッションで、あなたの数字をひとつずつお伝えします。");
+    } else {
+      setText("offer-h", "より詳しい鑑定はセッションで");
+      setText("offer-lead", "数字は、ほかの数字との組み合わせによって読み解き方が変わります。鑑定士がくわしくお伝えします。");
+    }
+    document.getElementById("offer").hidden = false;
+  }
+
+  // お店の名前・プライバシーの文言
+  document.querySelectorAll("[data-shop]").forEach(function (el) { el.textContent = CONFIG.shopName; });
+  if (CONFIG.gaId) {
+    setText("privacy", "※入力された名前と生年月日は、このページの中で数秘の計算にだけ使い、どこにも送信・保存しません。ページの利用状況（鑑定した回数など）だけを Google アナリティクスで計測しています。");
+  }
+
   /* ===== フォーム ===== */
   var form = document.getElementById("form");
   var nameEl = document.getElementById("name");
@@ -869,6 +1000,8 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     // キーボードを閉じる（スマホで拡大されたままにならないように）
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     render(name, Number(yEl.value), Number(mEl.value), Number(dEl.value), cleanKana(kanaEl.value));
+    showOffer(lastResult);
+    track("kantei");
     if (window.matchMedia("(max-width: 860px)").matches) {
       document.getElementById("core").scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -1172,7 +1305,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   function buildImage(r) {
     var fairy = FAIRIES[r.LP];
     var strings = ["数秘自動計算 あなたの数秘カード", r.name, r.birthText, fairy.name, fairy.catch, "過去数現在数未来数これまでのいまの自分",
-      "第一印象・見た目性格・考え方心の願い・好き嫌い将来のテーマ行動・役割PLSMD()・-計算できません母音子音がないため", "Numerology - 数秘自動計算 -"];
+      "第一印象・見た目性格・考え方心の願い・好き嫌い将来のテーマ行動・役割PLSMD()・-計算できません母音子音がないため", CONFIG.imageFooter || CONFIG.shopName];
     ["P", "LP", "S", "M", "D"].forEach(function (k) { if (r[k] !== null) strings.push(TEXTS[k][r[k]]); });
     ["past", "present", "future"].forEach(function (k) { strings.push(TEXTS[k][r[k]], CORE_DESC[k]); });
     var all = strings.join("") + "0123456789";
@@ -1273,7 +1406,8 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       drawLines(ctx, keywordLines(ctx, "D", r.D, dw - 260, 4, 21), dx + 236, dy + 52, 32);
 
       // フッター
-      ctx.textAlign = "center"; ctx.font = "italic 600 22px " + FONT_M; glowText(ctx, "Numerology - 数秘自動計算 -", 540, 1300, COLORS.muted);
+      ctx.textAlign = "center"; fitFont(ctx, CONFIG.imageFooter || CONFIG.shopName, "italic 600", 22, FONT_M, 960);
+      glowText(ctx, CONFIG.imageFooter || CONFIG.shopName, 540, 1300, COLORS.muted);
       return cv.toDataURL("image/png");
     });
   }
@@ -1292,12 +1426,13 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       imgSave.download = "numerology_" + lastResult.name.replace(/ /g, "_") + ".png";
       imgOut.hidden = false;
       imgMsg.textContent = "";
+      track("make_image");
     }).catch(function () {
       imgMsg.textContent = "画像を作れませんでした。ページを読み込み直して、もう一度お試しください。";
     }).then(function () { makeBtn.disabled = false; });
   });
 
-  window.__numerology = { toHepburn: toHepburn, calc: calc, normalizeName: normalizeName, fairySVG: fairySVG, FAIRIES: FAIRIES, buildImage: buildImage };
+  window.__numerology = { variant: VARIANT, from: FROM, toHepburn: toHepburn, calc: calc, normalizeName: normalizeName, fairySVG: fairySVG, FAIRIES: FAIRIES, buildImage: buildImage };
 })();
 </script>
 </body>

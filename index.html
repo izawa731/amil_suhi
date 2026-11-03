@@ -7,7 +7,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700;900&display=swap">
 <style>
 /* Layout: 緑のヘッダー → 昼の森の背景の上に「左：入力フォーム｜右：結果」→ 注意書きとボタン → 緑のフッター
    結果は上から「基本となる3つの数（過去数・現在数・未来数）」→ Name / Birthday → 5つの数（LP・S・D・P・M）→ 画像で保存 */
@@ -36,8 +36,8 @@
   --cta-1: #a6e6e3;
   --cta-2: #f3d58f;
   --cta-strong: #c4621c;  /* 予約ボタン */
-  --f-title: "Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif;
-  --f-body: "Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+  --f-title: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic", sans-serif;
+  --f-body: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
   color-scheme: light;
 }
 
@@ -63,8 +63,7 @@ body {
 .logo { width: 44px; height: 44px; flex: none; }
 .site-name {
   font-family: var(--f-title);
-  font-style: italic;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--gold);
   font-size: 17px;
   letter-spacing: .04em;
@@ -90,8 +89,8 @@ body {
 .page-title h1 {
   margin: 0;
   font-family: var(--f-title);
-  font-style: italic;
-  font-weight: 800;
+  font-weight: 900;
+  letter-spacing: .08em;
   color: var(--title);
   font-size: clamp(24px, 3.4vw, 34px);
   line-height: 1.25;
@@ -200,7 +199,6 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 .privacy {
   margin: 0;
   font-size: 11px;
-  font-style: italic;
   line-height: 1.6;
   color: var(--text-muted);
 }
@@ -298,6 +296,11 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 }
 .n-text .ph { color: var(--ink-muted); font-size: 12px; }
 
+/* ---------- 鑑定結果のフェードイン ---------- */
+.fade-in { animation: fadeUp .6s ease-out both; animation-delay: calc(var(--i, 0) * 80ms); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .fade-in { animation: none; } }
+
 /* ---------- セッションへの案内 ---------- */
 .offer {
   background: rgba(255, 255, 255, .92);
@@ -364,8 +367,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   margin: 0;
   max-width: 600px;
   font-family: var(--f-title);
-  font-style: italic;
-  font-weight: 600;
+  font-weight: 500;
   font-size: 14.5px;
   text-align: center;
   color: var(--text);
@@ -393,7 +395,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 /* ---------- footer ---------- */
 .site-footer { background: var(--night); padding-block: 40px; }
 .site-footer .inner { display: flex; justify-content: flex-end; }
-.site-footer p { margin: 0; font-family: var(--f-title); font-style: italic; font-size: 12px; letter-spacing: .1em; color: rgba(255, 255, 255, .85); }
+.site-footer p { margin: 0; font-family: var(--f-title); font-size: 12px; letter-spacing: .1em; color: rgba(255, 255, 255, .85); }
 
 /* ---------- スマホ ---------- */
 @media (max-width: 1000px) and (min-width: 641px) {
@@ -870,6 +872,19 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     setText("privacy", "※入力された名前と生年月日は、このページの中で数秘の計算にだけ使い、どこにも送信・保存しません。ページの利用状況（鑑定した回数など）だけを Google アナリティクスで計測しています。");
   }
 
+  /* ===== 鑑定結果を上から順にフェードイン ===== */
+  function fadeInResults() {
+    var els = [document.getElementById("core"), document.querySelector(".who")]
+      .concat([].slice.call(document.querySelectorAll("#chart .n-box")))
+      .concat([document.getElementById("offer"), document.querySelector(".export")]);
+    els.forEach(function (el, i) {
+      el.classList.remove("fade-in");
+      void el.offsetWidth; // 動きを最初からやり直す
+      el.style.setProperty("--i", i);
+      el.classList.add("fade-in");
+    });
+  }
+
   /* ===== フォーム ===== */
   var form = document.getElementById("form");
   var nameEl = document.getElementById("name");
@@ -1001,6 +1016,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
     render(name, Number(yEl.value), Number(mEl.value), Number(dEl.value), cleanKana(kanaEl.value));
     showOffer(lastResult);
+    fadeInResults();
     track("kantei");
     if (window.matchMedia("(max-width: 860px)").matches) {
       document.getElementById("core").scrollIntoView({ behavior: "smooth", block: "start" });
@@ -1246,8 +1262,8 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 
   /* ===== 画像（1080×1350）を作る ===== */
   var IMG_W = 1080, IMG_H = 1350;
-  var FONT_G = '"Zen Kaku Gothic New", "Hiragino Sans", "Yu Gothic", sans-serif';
-  var FONT_M = '"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", serif';
+  var FONT_G = '"Zen Maru Gothic", "Hiragino Maru Gothic ProN", "Hiragino Sans", "Yu Gothic", sans-serif';
+  var FONT_M = FONT_G; // 見出し用（同じ丸ゴシックを太字で使う）
   // 画像のカードの見出し（ページの見出しと同じ言葉）
   var LABELS = { P: "第一印象・見た目", LP: "性格・考え方", S: "心の願い・好き嫌い", M: "将来のテーマ", D: "行動・役割" };
   var COLORS = { past: "#e0245e", present: "#e3c81e", future: "#f0a12f", num: "#2f5a2c", ink: "#26371f", muted: "#4a5c40" };
@@ -1310,9 +1326,9 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     ["past", "present", "future"].forEach(function (k) { strings.push(TEXTS[k][r[k]], CORE_DESC[k]); });
     var all = strings.join("") + "0123456789";
     var fontsReady = document.fonts ? Promise.all([
-      document.fonts.load('700 40px "Zen Kaku Gothic New"', all),
-      document.fonts.load('400 40px "Zen Kaku Gothic New"', all),
-      document.fonts.load('800 40px "Shippori Mincho"', all)
+      document.fonts.load('900 40px "Zen Maru Gothic"', all),
+      document.fonts.load('700 40px "Zen Maru Gothic"', all),
+      document.fonts.load('500 40px "Zen Maru Gothic"', all)
     ]).catch(function () {}) : Promise.resolve();
     var src = fairy.img || ("data:image/svg+xml;charset=utf-8," + encodeURIComponent(fairySVG(r.LP)));
 
@@ -1325,7 +1341,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
 
       // 見出し・名前・生年月日
-      ctx.font = "800 34px " + FONT_M; glowText(ctx, "数秘自動計算 ・ あなたの数秘カード", 540, 66, COLORS.num);
+      ctx.font = "900 34px " + FONT_M; glowText(ctx, "数秘自動計算 ・ あなたの数秘カード", 540, 66, COLORS.num);
       fitFont(ctx, r.name, "700", 54, FONT_G, 960); glowText(ctx, r.name, 540, 134, COLORS.ink);
       fitFont(ctx, r.birthText, "500", 28, FONT_G, 960); glowText(ctx, r.birthText, 540, 180, COLORS.muted);
 
@@ -1353,7 +1369,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       if (fh > box) { fh = box; fw = fh * (im.width / im.height); }
       ctx.drawImage(im, 540 - fw / 2, 494 + (box - fh) / 2, fw, fh);
       ctx.textAlign = "center";
-      ctx.font = "800 42px " + FONT_M; glowText(ctx, fairy.name, 540, 932, COLORS.num);
+      ctx.font = "900 42px " + FONT_M; glowText(ctx, fairy.name, 540, 932, COLORS.num);
       ctx.font = "700 25px " + FONT_G; glowText(ctx, "「" + fairy.catch + "」", 540, 972, COLORS.ink);
 
       // 周りの5つの数
@@ -1406,7 +1422,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       drawLines(ctx, keywordLines(ctx, "D", r.D, dw - 260, 4, 21), dx + 236, dy + 52, 32);
 
       // フッター
-      ctx.textAlign = "center"; fitFont(ctx, CONFIG.imageFooter || CONFIG.shopName, "italic 600", 22, FONT_M, 960);
+      ctx.textAlign = "center"; fitFont(ctx, CONFIG.imageFooter || CONFIG.shopName, "700", 22, FONT_M, 960);
       glowText(ctx, CONFIG.imageFooter || CONFIG.shopName, 540, 1300, COLORS.muted);
       return cv.toDataURL("image/png");
     });

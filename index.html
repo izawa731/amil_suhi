@@ -132,6 +132,12 @@ select, input[type="text"] {
 }
 input[type="text"] { letter-spacing: .05em; padding: 6px 12px; }
 input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
+.romaji-label { margin-top: 10px; font-size: 13px !important; }
+#name { text-transform: uppercase; }
+/* iPhone は 16px 未満の入力欄を押すと画面を拡大するので、スマホでは 16px にする */
+@media (max-width: 860px), (pointer: coarse) {
+  select, input[type="text"] { font-size: 16px; }
+}
 .notes { margin: 6px 0 0; font-size: 11px; line-height: 1.6; color: var(--text-muted); }
 .notes p { margin: 0; }
 .link-btn {
@@ -413,12 +419,14 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
             </div>
           </div>
           <div>
-            <label class="f-label" for="name">Name（氏名）</label>
-            <input type="text" id="name" inputmode="email" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="ローマ字で入力" maxlength="60">
-            <p class="name-warn" id="name-warn" role="status" hidden>ローマ字（A〜Z）で入力してください。書き方は <button type="button" class="link-btn" data-guide>ヘボン式ローマ字ガイド</button> を見てください。</p>
+            <label class="f-label" for="kana">Name（氏名・ひらがな）</label>
+            <input type="text" id="kana" autocomplete="off" placeholder="例：やまだ たろう" maxlength="40">
+            <p class="name-warn" id="name-warn" role="status" hidden>漢字は読み方がわからないため変換できません。ひらがなで入力してください。</p>
+            <label class="f-label romaji-label" for="name">ローマ字（自動で入ります）</label>
+            <input type="text" id="name" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="YAMADA TARO" maxlength="60">
             <div class="notes">
-              <p>※苗字と名前の順番は関係ありません。</p>
-              <p>※基本的に<button type="button" class="link-btn" data-guide>「ヘボン式ローマ字」</button>を使います。</p>
+              <p>※苗字と名前の間はスペースを空けてください。順番はどちらでもかまいません。</p>
+              <p>※パスポートと同じ<button type="button" class="link-btn" data-guide>ヘボン式ローマ字</button>に変換します。パスポートと違うときは、ローマ字の欄を直してください。</p>
             </div>
           </div>
           <p class="error" id="error" role="alert" hidden></p>
@@ -706,9 +714,9 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   /* ===== 表示 ===== */
   function setText(id, v) { document.getElementById(id).textContent = v; }
 
-  function render(name, y, m, d) {
+  function render(name, y, m, d, kana) {
     var r = calc(name, y, m, d);
-    setText("out-name", name);
+    setText("out-name", name + (kana ? "（" + kana + "）" : ""));
     setText("out-birth", y + "/" + m + "/" + d);
     document.querySelectorAll(".n-box").forEach(function (box) {
       var k = box.dataset.k, v = r[k];
@@ -724,7 +732,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       }
     });
     r.name = name;
-    r.birthText = y + "年" + m + "月" + d + "日生まれ";
+    r.birthText = (kana ? kana + " ・ " : "") + y + "年" + m + "月" + d + "日生まれ";
     lastResult = r;
     makeBtn.disabled = false;
     imgOut.hidden = true;
@@ -752,10 +760,86 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   yEl.addEventListener("change", fillDays);
   mEl.addEventListener("change", fillDays);
 
-  // 名前欄に日本語（かな・漢字）が入ったら案内を出す
-  var JP = /[\u3040-\u30ff\u3400-\u9fff\uff66-\uff9f]/;
+  /* ===== ひらがな → ヘボン式ローマ字（パスポートの書き方） ===== */
+  var KANA = {
+    "あ": "A", "い": "I", "う": "U", "え": "E", "お": "O",
+    "か": "KA", "き": "KI", "く": "KU", "け": "KE", "こ": "KO",
+    "さ": "SA", "し": "SHI", "す": "SU", "せ": "SE", "そ": "SO",
+    "た": "TA", "ち": "CHI", "つ": "TSU", "て": "TE", "と": "TO",
+    "な": "NA", "に": "NI", "ぬ": "NU", "ね": "NE", "の": "NO",
+    "は": "HA", "ひ": "HI", "ふ": "FU", "へ": "HE", "ほ": "HO",
+    "ま": "MA", "み": "MI", "む": "MU", "め": "ME", "も": "MO",
+    "や": "YA", "ゆ": "YU", "よ": "YO",
+    "ら": "RA", "り": "RI", "る": "RU", "れ": "RE", "ろ": "RO",
+    "わ": "WA", "ゐ": "I", "ゑ": "E", "を": "O", "ん": "N",
+    "が": "GA", "ぎ": "GI", "ぐ": "GU", "げ": "GE", "ご": "GO",
+    "ざ": "ZA", "じ": "JI", "ず": "ZU", "ぜ": "ZE", "ぞ": "ZO",
+    "だ": "DA", "ぢ": "JI", "づ": "ZU", "で": "DE", "ど": "DO",
+    "ば": "BA", "び": "BI", "ぶ": "BU", "べ": "BE", "ぼ": "BO",
+    "ぱ": "PA", "ぴ": "PI", "ぷ": "PU", "ぺ": "PE", "ぽ": "PO",
+    "ゔ": "BU", "ぁ": "A", "ぃ": "I", "ぅ": "U", "ぇ": "E", "ぉ": "O", "ゃ": "YA", "ゅ": "YU", "ょ": "YO", "ゎ": "WA"
+  };
+  var KANA2 = {
+    "ふぁ": "FA", "ふぃ": "FI", "ふぇ": "FE", "ふぉ": "FO", "てぃ": "TI", "でぃ": "DI", "とぅ": "TU", "どぅ": "DU",
+    "しぇ": "SHE", "ちぇ": "CHE", "じぇ": "JE", "うぃ": "WI", "うぇ": "WE", "うぉ": "WO", "いぇ": "YE",
+    "ゔぁ": "BA", "ゔぃ": "BI", "ゔぇ": "BE", "ゔぉ": "BO"
+  };
+  // 拗音（きゃ・しゃ・ちゃ …）
+  [["き", "KY"], ["ぎ", "GY"], ["し", "SH"], ["じ", "J"], ["ち", "CH"], ["ぢ", "J"], ["に", "NY"],
+   ["ひ", "HY"], ["び", "BY"], ["ぴ", "PY"], ["み", "MY"], ["り", "RY"]].forEach(function (p) {
+    KANA2[p[0] + "ゃ"] = p[1] + "A"; KANA2[p[0] + "ゅ"] = p[1] + "U"; KANA2[p[0] + "ょ"] = p[1] + "O";
+  });
+
+  // 戻り値：{ romaji: "YAMADA TARO", unknown: 漢字などの変換できない文字があったか }
+  function toHepburn(text) {
+    var src = (text || "").normalize("NFKC").replace(/[\u30a1-\u30f6]/g, function (c) {
+      return String.fromCharCode(c.charCodeAt(0) - 0x60); // カタカナ → ひらがな
+    }).replace(/\s+/g, " ").trim();
+    var syl = [], unknown = false;
+    for (var i = 0; i < src.length; i++) {
+      var c = src[i], two = src.substr(i, 2);
+      if (c === " ") syl.push({ t: "sp" });
+      else if (c === "ー" || c === "-") syl.push({ t: "long" });
+      else if (c === "っ") syl.push({ t: "tsu" });
+      else if (KANA2[two]) { syl.push({ t: "kana", r: KANA2[two] }); i++; }
+      else if (KANA[c]) syl.push({ t: "kana", r: KANA[c] });
+      else if (/[A-Za-z]/.test(c)) syl.push({ t: "latin", r: c.toUpperCase() });
+      else unknown = true;
+    }
+    var out = "", prev = null, prevDropped = false, doubled = false;
+    syl.forEach(function (s, idx) {
+      if (s.t === "sp") { out += " "; prev = null; prevDropped = false; doubled = false; return; }
+      if (s.t === "long") return;                         // 「ー」は書かない
+      if (s.t === "tsu") { doubled = true; return; }
+      if (s.t === "latin") { out += s.r; prev = null; prevDropped = false; return; }
+      var r = s.r, next = syl[idx + 1];
+      var nextVowel = next && next.t === "kana" && /^[AIUEO]/.test(next.r);
+      var last = prev ? prev.slice(-1) : "";
+      // のばす音：O・U の後の「う」、O の後の「お」は書かない（直前で省いたときは省かない）
+      if (prev && !prevDropped && ((r === "U" && (last === "O" || last === "U") && !nextVowel) || (r === "O" && last === "O"))) {
+        prevDropped = true; return;
+      }
+      // 「ん」は B・M・P の前で M
+      if (r === "N" && next && next.t === "kana" && /^[BMP]/.test(next.r)) {
+        r = "M";
+      }
+      // 小さい「っ」は次の文字を重ねる（「っち」は TCH）
+      if (doubled && /^[^AIUEO]/.test(r)) r = (r.indexOf("CH") === 0 ? "T" : r[0]) + r;
+      doubled = false;
+      out += r; prev = r; prevDropped = false;
+    });
+    return { romaji: out.trim(), unknown: unknown };
+  }
+
+  // ひらがな欄を打つたびにローマ字欄を自動で埋める
+  var kanaEl = document.getElementById("kana");
   var warnEl = document.getElementById("name-warn");
-  nameEl.addEventListener("input", function () { warnEl.hidden = !JP.test(nameEl.value); });
+  function cleanKana(v) { return (v || "").normalize("NFKC").replace(/\s+/g, " ").trim(); }
+  kanaEl.addEventListener("input", function () {
+    var h = toHepburn(kanaEl.value);
+    nameEl.value = h.romaji;
+    warnEl.hidden = !h.unknown;
+  });
 
   // ヘボン式ローマ字ガイド
   var guide = document.getElementById("guide");
@@ -768,21 +852,23 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 
   form.addEventListener("submit", function (e) {
     e.preventDefault();
-    if (JP.test(nameEl.value)) {
+    if (toHepburn(kanaEl.value).unknown) {
       warnEl.hidden = false;
-      nameEl.focus();
+      kanaEl.focus();
       return;
     }
     var name = normalizeName(nameEl.value);
     if (!name) {
-      errEl.textContent = "お名前をローマ字（A〜Z）で入力してください。";
+      errEl.textContent = "お名前をひらがなで入力してください。";
       errEl.hidden = false;
-      nameEl.focus();
+      kanaEl.focus();
       return;
     }
     errEl.hidden = true;
     nameEl.value = name;
-    render(name, Number(yEl.value), Number(mEl.value), Number(dEl.value));
+    // キーボードを閉じる（スマホで拡大されたままにならないように）
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    render(name, Number(yEl.value), Number(mEl.value), Number(dEl.value), cleanKana(kanaEl.value));
     if (window.matchMedia("(max-width: 860px)").matches) {
       document.getElementById("core").scrollIntoView({ behavior: "smooth", block: "start" });
     }
@@ -1045,7 +1131,8 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   function wrap(ctx, text, maxW) {
     var lines = [], line = "";
     text.split("").forEach(function (ch) {
-      if (ctx.measureText(line + ch).width > maxW && line) { lines.push(line); line = ch; } else { line += ch; }
+      // 「。」「、」などは行の頭に来ないよう、前の行に付ける
+      if (ctx.measureText(line + ch).width > maxW && line && "。、）」・".indexOf(ch) < 0) { lines.push(line); line = ch; } else { line += ch; }
     });
     if (line) lines.push(line);
     return lines;
@@ -1107,7 +1194,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       // 見出し・名前・生年月日
       ctx.font = "800 34px " + FONT_M; glowText(ctx, "数秘自動計算 ・ あなたの数秘カード", 540, 66, COLORS.num);
       fitFont(ctx, r.name, "700", 54, FONT_G, 960); glowText(ctx, r.name, 540, 134, COLORS.ink);
-      ctx.font = "500 28px " + FONT_G; glowText(ctx, r.birthText, 540, 180, COLORS.muted);
+      fitFont(ctx, r.birthText, "500", 28, FONT_G, 960); glowText(ctx, r.birthText, 540, 180, COLORS.muted);
 
       // 過去数・現在数・未来数
       // 見出し・数字 → ひとこと（意味）→ 区切り線 → キーワード3つ
@@ -1210,7 +1297,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     }).then(function () { makeBtn.disabled = false; });
   });
 
-  window.__numerology = { calc: calc, normalizeName: normalizeName, fairySVG: fairySVG, FAIRIES: FAIRIES, buildImage: buildImage };
+  window.__numerology = { toHepburn: toHepburn, calc: calc, normalizeName: normalizeName, fairySVG: fairySVG, FAIRIES: FAIRIES, buildImage: buildImage };
 })();
 </script>
 </body>

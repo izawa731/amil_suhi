@@ -134,6 +134,45 @@ input[type="text"] { letter-spacing: .05em; padding: 6px 12px; }
 input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 .notes { margin: 6px 0 0; font-size: 11px; line-height: 1.6; color: var(--text-muted); }
 .notes p { margin: 0; }
+.link-btn {
+  font: inherit;
+  color: var(--title);
+  background: none;
+  border: 0;
+  padding: 0;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.name-warn { margin: 6px 0 0; font-size: 12px; color: #8a1033; background: rgba(255, 255, 255, .85); border-radius: 6px; padding: 4px 8px; }
+
+/* ヘボン式ローマ字ガイド */
+.guide {
+  width: min(560px, calc(100vw - 32px));
+  max-height: 86vh;
+  border: 0;
+  border-radius: 16px;
+  padding: 0;
+  color: var(--text);
+  background: #fbfdf6;
+  box-shadow: 0 10px 40px rgba(20, 50, 20, .35);
+}
+.guide::backdrop { background: rgba(20, 40, 20, .45); }
+.guide-body { padding: 22px 22px 18px; display: grid; gap: 10px; font-size: 14px; }
+.guide h2 { margin: 0; font-family: var(--f-title); font-size: 21px; color: var(--title); }
+.guide h3 { margin: 8px 0 0; font-size: 15px; color: var(--title); }
+.guide p, .guide ul { margin: 0; }
+.guide ul { padding-left: 1.2em; display: grid; gap: 2px; }
+.guide b { letter-spacing: .06em; }
+.guide .ex { white-space: nowrap; margin-right: .8em; }
+.kana-grid { margin: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+.kana-grid div { background: #eef6e4; border-radius: 8px; padding: 4px 8px; display: flex; justify-content: space-between; gap: 6px; }
+.kana-grid dt { font-weight: 700; }
+.kana-grid dd { margin: 0; font-weight: 700; letter-spacing: .06em; color: var(--title); }
+.guide-close { justify-self: center; margin-top: 8px; }
+.guide form { display: grid; }
+@media (max-width: 480px) { .kana-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .error { color: #8a1033; background: rgba(255, 255, 255, .85); border: 1px solid #e0245e; border-radius: 6px; padding: 6px 10px; font-size: 12.5px; margin: 0; }
 .submit {
   justify-self: center;
@@ -375,10 +414,11 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
           </div>
           <div>
             <label class="f-label" for="name">Name（氏名）</label>
-            <input type="text" id="name" autocomplete="off" placeholder="ローマ字で入力" maxlength="60">
+            <input type="text" id="name" inputmode="email" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="ローマ字で入力" maxlength="60">
+            <p class="name-warn" id="name-warn" role="status" hidden>ローマ字（A〜Z）で入力してください。書き方は <button type="button" class="link-btn" data-guide>ヘボン式ローマ字ガイド</button> を見てください。</p>
             <div class="notes">
               <p>※苗字と名前の順番は関係ありません。</p>
-              <p>※基本的に「ヘボン式ローマ字」を使います。</p>
+              <p>※基本的に<button type="button" class="link-btn" data-guide>「ヘボン式ローマ字」</button>を使います。</p>
             </div>
           </div>
           <p class="error" id="error" role="alert" hidden></p>
@@ -395,9 +435,9 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
             <h2 id="core-h">あなた<small>の</small>基本<small>となる</small>３<small>つの</small><br>魂<small>の</small>数字<small>は…</small></h2>
           </div>
           <div class="core-cards">
-            <div class="n-box core-box past" data-k="past"><div class="n-tab"><div class="n-num">-</div><div class="n-head"><span class="n-name">過去数</span><span class="n-desc">子どものころから持っている資質。これまでに育ててきた力</span></div></div><div class="n-text"></div></div>
-            <div class="n-box core-box present" data-k="present"><div class="n-tab"><div class="n-num">-</div><div class="n-head"><span class="n-name">現在数</span><span class="n-desc">いまの人生で取り組むテーマ。いま発揮している力</span></div></div><div class="n-text"></div></div>
-            <div class="n-box core-box future" data-k="future"><div class="n-tab"><div class="n-num">-</div><div class="n-head"><span class="n-name">未来数</span><span class="n-desc">これから育っていく可能性。未来で花ひらく力</span></div></div><div class="n-text"></div></div>
+            <div class="n-box core-box past" data-k="past"><div class="n-tab"><div class="n-num">-</div><div class="n-head"><span class="n-name">過去数</span><span class="n-desc"></span></div></div><div class="n-text"></div></div>
+            <div class="n-box core-box present" data-k="present"><div class="n-tab"><div class="n-num">-</div><div class="n-head"><span class="n-name">現在数</span><span class="n-desc"></span></div></div><div class="n-text"></div></div>
+            <div class="n-box core-box future" data-k="future"><div class="n-tab"><div class="n-num">-</div><div class="n-head"><span class="n-name">未来数</span><span class="n-desc"></span></div></div><div class="n-text"></div></div>
           </div>
         </section>
 
@@ -428,6 +468,48 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 
       </div>
     </div>
+
+    <dialog class="guide" id="guide" aria-labelledby="guide-h">
+      <div class="guide-body">
+        <h2 id="guide-h">ヘボン式ローマ字の書き方</h2>
+        <p>パスポートと同じ書き方で入力するのがおすすめです。苗字と名前の順番はどちらでもかまいません。</p>
+
+        <h3>まちがえやすい音</h3>
+        <dl class="kana-grid">
+          <div><dt>し</dt><dd>SHI</dd></div><div><dt>ち</dt><dd>CHI</dd></div><div><dt>つ</dt><dd>TSU</dd></div><div><dt>ふ</dt><dd>FU</dd></div>
+          <div><dt>じ・ぢ</dt><dd>JI</dd></div><div><dt>づ</dt><dd>ZU</dd></div><div><dt>を</dt><dd>O</dd></div><div><dt>しゃ</dt><dd>SHA</dd></div>
+          <div><dt>しゅ</dt><dd>SHU</dd></div><div><dt>しょ</dt><dd>SHO</dd></div><div><dt>ちゃ</dt><dd>CHA</dd></div><div><dt>ちゅ</dt><dd>CHU</dd></div>
+          <div><dt>ちょ</dt><dd>CHO</dd></div><div><dt>じゃ</dt><dd>JA</dd></div><div><dt>じゅ</dt><dd>JU</dd></div><div><dt>じょ</dt><dd>JO</dd></div>
+        </dl>
+
+        <h3>のばす音は書きません</h3>
+        <ul>
+          <li><span class="ex">ゆうこ → <b>YUKO</b></span> <span class="ex">おおの → <b>ONO</b></span> <span class="ex">しょうた → <b>SHOTA</b></span></li>
+          <li>パスポートで OH などを使っている方は、その書き方で入力してください。</li>
+        </ul>
+
+        <h3>小さい「っ」は次の文字を重ねます</h3>
+        <ul>
+          <li><span class="ex">はっとり → <b>HATTORI</b></span> <span class="ex">きっかわ → <b>KIKKAWA</b></span></li>
+          <li>「っち」は TCH：<span class="ex">はっちょう → <b>HATCHO</b></span></li>
+        </ul>
+
+        <h3>「ん」は N（B・M・P の前は M）</h3>
+        <ul>
+          <li><span class="ex">かんの → <b>KANNO</b></span> <span class="ex">けんじ → <b>KENJI</b></span></li>
+          <li><span class="ex">なんば → <b>NAMBA</b></span> <span class="ex">ほんま → <b>HOMMA</b></span> <span class="ex">さんぺい → <b>SAMPEI</b></span></li>
+        </ul>
+
+        <h3>入力の例</h3>
+        <ul>
+          <li>さとう しょうた → <b>SATO SHOTA</b></li>
+          <li>いとう じゅんいち → <b>ITO JUNICHI</b></li>
+          <li>きくち ゆうこ → <b>KIKUCHI YUKO</b></li>
+        </ul>
+
+        <form method="dialog"><button class="submit guide-close">閉じる</button></form>
+      </div>
+    </dialog>
 
     <div class="after">
       <p class="caution">※他の数字との組み合わせによって読み解き方は変わります。くわしい鑑定をご希望の方は、鑑定士によるセッションをおすすめします。</p>
@@ -670,8 +752,27 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   yEl.addEventListener("change", fillDays);
   mEl.addEventListener("change", fillDays);
 
+  // 名前欄に日本語（かな・漢字）が入ったら案内を出す
+  var JP = /[\u3040-\u30ff\u3400-\u9fff\uff66-\uff9f]/;
+  var warnEl = document.getElementById("name-warn");
+  nameEl.addEventListener("input", function () { warnEl.hidden = !JP.test(nameEl.value); });
+
+  // ヘボン式ローマ字ガイド
+  var guide = document.getElementById("guide");
+  document.querySelectorAll("[data-guide]").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      if (guide.showModal) guide.showModal(); else guide.setAttribute("open", "");
+    });
+  });
+  guide.addEventListener("click", function (e) { if (e.target === guide) guide.close(); });
+
   form.addEventListener("submit", function (e) {
     e.preventDefault();
+    if (JP.test(nameEl.value)) {
+      warnEl.hidden = false;
+      nameEl.focus();
+      return;
+    }
     var name = normalizeName(nameEl.value);
     if (!name) {
       errEl.textContent = "お名前をローマ字（A〜Z）で入力してください。";
@@ -794,11 +895,15 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     22: { name: "大樹の妖精",       catch: "大きな夢を形に",     dress: "#63a85e", hair: "#4a3020", wing: "#dcf5d0", deco: "tree",      img: "" },
     33: { name: "光の妖精",         catch: "無償の愛と癒し",     dress: "#fff6d8", hair: "#e0a84a", wing: "#ffffff", deco: "light",     img: "" }
   };
-  // 過去数・現在数・未来数のカードに入れるひとこと
-  var SHORT = {
-    1: "はじまり・自立", 2: "調和・協力", 3: "創造・楽しさ", 4: "安定・努力", 5: "自由・変化", 6: "愛・奉仕",
-    7: "探究・知性", 8: "豊かさ・達成", 9: "博愛・完成", 11: "直感・ひらめき", 22: "大きな夢の実現", 33: "無償の愛・癒し"
+  // 過去数・現在数・未来数のひとこと（ページの箱と画像のカードの両方で使う）
+  var CORE_DESC = {
+    past: "子どものころから持っている資質。これまでに育ててきた力",
+    present: "いまの人生で取り組むテーマ。いま発揮している力",
+    future: "これから育っていく可能性。未来で花ひらく力"
   };
+  Object.keys(CORE_DESC).forEach(function (k) {
+    document.querySelector('.core-box[data-k="' + k + '"] .n-desc').textContent = CORE_DESC[k];
+  });
 
   var OL = ' stroke="#2a2a3a" stroke-width="2.5" stroke-linejoin="round"';
   function starPath(cx, cy, R, r) {
@@ -982,7 +1087,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     var strings = ["数秘自動計算 あなたの数秘カード", r.name, r.birthText, fairy.name, fairy.catch, "過去数現在数未来数これまでのいまの自分",
       "第一印象・見た目性格・考え方心の願い・好き嫌い将来のテーマ行動・役割PLSMD()・-計算できません母音子音がないため", "Numerology - 数秘自動計算 -"];
     ["P", "LP", "S", "M", "D"].forEach(function (k) { if (r[k] !== null) strings.push(TEXTS[k][r[k]]); });
-    [r.past, r.present, r.future].forEach(function (v) { strings.push(SHORT[v]); });
+    ["past", "present", "future"].forEach(function (k) { strings.push(TEXTS[k][r[k]], CORE_DESC[k]); });
     var all = strings.join("") + "0123456789";
     var fontsReady = document.fonts ? Promise.all([
       document.fonts.load('700 40px "Zen Kaku Gothic New"', all),
@@ -1005,27 +1110,31 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       ctx.font = "500 28px " + FONT_G; glowText(ctx, r.birthText, 540, 180, COLORS.muted);
 
       // 過去数・現在数・未来数
-      [["過去数", "これまでの自分", r.past, COLORS.past], ["現在数", "いまの自分", r.present, COLORS.present], ["未来数", "これからの自分", r.future, COLORS.future]]
+      // 見出し・数字 → ひとこと（意味）→ 区切り線 → キーワード3つ
+      [["past", "過去数", COLORS.past], ["present", "現在数", COLORS.present], ["future", "未来数", COLORS.future]]
         .forEach(function (c, i) {
-          var x = 60 + i * 330, y = 208, w = 300, h = 150;
-          card(ctx, x, y, w, h, c[3]);
+          var k = c[0], x = 60 + i * 330, y = 200, w = 300, h = 250;
+          card(ctx, x, y, w, h, c[2]);
           ctx.textAlign = "left";
-          ctx.fillStyle = COLORS.ink; ctx.font = "700 30px " + FONT_G; ctx.fillText(c[0], x + 24, y + 48);
-          ctx.fillStyle = COLORS.muted; ctx.font = "500 18px " + FONT_G; ctx.fillText(c[1], x + 24, y + 76);
-          ctx.textAlign = "right"; ctx.fillStyle = COLORS.num; ctx.font = "700 72px " + FONT_G; ctx.fillText(c[2], x + w - 22, y + 82);
-          ctx.textAlign = "center"; ctx.fillStyle = COLORS.ink; ctx.font = "700 24px " + FONT_G; ctx.fillText(SHORT[c[2]], x + w / 2, y + 126);
+          ctx.fillStyle = COLORS.ink; ctx.font = "700 30px " + FONT_G; ctx.fillText(c[1], x + 22, y + 46);
+          ctx.textAlign = "right"; ctx.fillStyle = COLORS.num; ctx.font = "700 64px " + FONT_G; ctx.fillText(r[k], x + w - 20, y + 66);
+          ctx.textAlign = "left"; ctx.fillStyle = COLORS.muted; ctx.font = "500 17px " + FONT_G;
+          wrap(ctx, CORE_DESC[k], w - 44).slice(0, 2).forEach(function (ln, j) { ctx.fillText(ln, x + 22, y + 94 + j * 24); });
+          ctx.strokeStyle = "#cfe3c0"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 22, y + 136); ctx.lineTo(x + w - 22, y + 136); ctx.stroke();
+          ctx.fillStyle = COLORS.ink;
+          drawLines(ctx, keywordLines(ctx, k, r[k], w - 44, 3, 20), x + 22, y + 168, 28);
         });
 
       // 中央の妖精
-      var glow = ctx.createRadialGradient(540, 630, 20, 540, 630, 240);
+      var glow = ctx.createRadialGradient(540, 690, 20, 540, 690, 220);
       glow.addColorStop(0, "rgba(255,255,235,.95)"); glow.addColorStop(1, "rgba(255,255,235,0)");
-      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(540, 630, 240, 0, Math.PI * 2); ctx.fill();
-      var fw = 360, fh = fw * (im.height / im.width || 1.2);
-      if (fh > 440) { fh = 440; fw = fh * (im.width / im.height); }
-      ctx.drawImage(im, 540 - fw / 2, 412 + (440 - fh) / 2, fw, fh);
+      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(540, 690, 220, 0, Math.PI * 2); ctx.fill();
+      var box = 390, fw = 330, fh = fw * (im.height / im.width || 1.2);
+      if (fh > box) { fh = box; fw = fh * (im.width / im.height); }
+      ctx.drawImage(im, 540 - fw / 2, 494 + (box - fh) / 2, fw, fh);
       ctx.textAlign = "center";
-      ctx.font = "800 44px " + FONT_M; glowText(ctx, fairy.name, 540, 900, COLORS.num);
-      ctx.font = "700 26px " + FONT_G; glowText(ctx, "「" + fairy.catch + "」", 540, 942, COLORS.ink);
+      ctx.font = "800 42px " + FONT_M; glowText(ctx, fairy.name, 540, 932, COLORS.num);
+      ctx.font = "700 25px " + FONT_G; glowText(ctx, "「" + fairy.catch + "」", 540, 972, COLORS.ink);
 
       // 周りの5つの数
       // 数字。ゾロ目があれば「8(44)」のように小さく添える
@@ -1052,29 +1161,29 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       }
       // 周りの4つの数
       function sideCard(k, x, y) {
-        var w = 290, h = 250, v = r[k];
+        var w = 290, h = 230, v = r[k];
         card(ctx, x, y, w, h, null);
-        drawLabel(k, x + 20, y + 42, w - 40);
-        drawBadge(k, x + 20, y + 88);
-        drawNum(v, r.zoro[k], x + w - 20, y + 108, 62, "right");
-        ctx.strokeStyle = "#cfe3c0"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 20, y + 124); ctx.lineTo(x + w - 20, y + 124); ctx.stroke();
+        drawLabel(k, x + 20, y + 40, w - 40);
+        drawBadge(k, x + 20, y + 82);
+        drawNum(v, r.zoro[k], x + w - 20, y + 100, 58, "right");
+        ctx.strokeStyle = "#cfe3c0"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x + 20, y + 114); ctx.lineTo(x + w - 20, y + 114); ctx.stroke();
         ctx.textAlign = "left"; ctx.fillStyle = COLORS.ink;
-        drawLines(ctx, keywordLines(ctx, k, v, w - 40, 3, 21), x + 20, y + 158, 30);
+        drawLines(ctx, keywordLines(ctx, k, v, w - 40, 3, 20), x + 20, y + 146, 28);
       }
-      sideCard("P", 30, 396);
-      sideCard("M", 30, 666);
-      sideCard("LP", 760, 396);
-      sideCard("S", 760, 666);
+      sideCard("P", 30, 478);
+      sideCard("M", 30, 728);
+      sideCard("LP", 760, 478);
+      sideCard("S", 760, 728);
 
       // 行動・役割（D）は下の横長カード
-      var dx = 190, dy = 978, dw = 700, dh = 196;
+      var dx = 190, dy = 996, dw = 700, dh = 178;
       card(ctx, dx, dy, dw, dh, null);
-      drawLabel("D", dx + 28, dy + 48, 170);
-      drawBadge("D", dx + 28, dy + 88);
-      drawNum(r.D, r.zoro.D, dx + 28, dy + 164, 70, "left");
-      ctx.strokeStyle = "#cfe3c0"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(dx + 210, dy + 26); ctx.lineTo(dx + 210, dy + dh - 26); ctx.stroke();
+      drawLabel("D", dx + 28, dy + 46, 170);
+      drawBadge("D", dx + 28, dy + 84);
+      drawNum(r.D, r.zoro.D, dx + 28, dy + 152, 66, "left");
+      ctx.strokeStyle = "#cfe3c0"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(dx + 210, dy + 24); ctx.lineTo(dx + 210, dy + dh - 24); ctx.stroke();
       ctx.textAlign = "left"; ctx.fillStyle = COLORS.ink;
-      drawLines(ctx, keywordLines(ctx, "D", r.D, dw - 260, 4, 22), dx + 236, dy + 56, 34);
+      drawLines(ctx, keywordLines(ctx, "D", r.D, dw - 260, 4, 21), dx + 236, dy + 52, 32);
 
       // フッター
       ctx.textAlign = "center"; ctx.font = "italic 600 22px " + FONT_M; glowText(ctx, "Numerology - 数秘自動計算 -", 540, 1300, COLORS.muted);

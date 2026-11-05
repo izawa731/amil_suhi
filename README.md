@@ -66,10 +66,34 @@ LP・S・D・P・M は、足していく途中で 44・55・66・77・88・99 �
 ## 公開のしかた（note の記事から使ってもらう）
 note の記事の中にはこのページを埋め込めないため、ページを別の場所に公開して、記事からリンクします。
 
-1. GitHub のこのリポジトリで **Settings → Pages** を開き、Branch に公開したいブランチと `/ (root)` を選んで保存
-   （リポジトリが非公開の場合は GitHub の有料プランが必要です。無料で使うなら Cloudflare Pages や Netlify に `index.html` をアップロード）
-2. 表示された URL（例：`https://ユーザー名.github.io/amil_suhi/`）を note の記事に貼る
-3. 記事ごとに、URL の最後に `?from=記事の名前` を付ける（例：`…/amil_suhi/?from=note1`）。どの記事から来た人かを計測できます
+### 段階ごとの方針
+| 段階 | 公開先 | 費用 | URL |
+|---|---|---|---|
+| 今（試し） | GitHub Pages | 無料 | `https://izawa731.github.io/amil_suhi/` |
+| 運用が回り始めたら | 独自ドメインを Cloudflare で買い、GitHub Pages につなぐ | 年1,500円前後（.com の場合） | 例：`https://amil-suhi.com/` |
+| アクセスが大きく増えたら | ページを Cloudflare Pages に移す | 無料 | 独自ドメインのまま |
+
+GitHub Pages・Cloudflare Pages は「ページを置く場所」、独自ドメインは「住所（URL）」です。Cloudflare は住所の購入先（原価販売で更新料が上がらない）にもなります。
+
+### GitHub Pages で公開する（試し）
+1. リポジトリを公開にする：**Settings → General → 一番下の Danger Zone → Change repository visibility → Public**
+   （無料プランでは、非公開のリポジトリで GitHub Pages を使えません）
+2. **Settings → Pages** → Build and deployment の Source を「Deploy from a branch」、Branch を `main`・`/ (root)` にして Save
+3. 1〜2分後に `https://izawa731.github.io/amil_suhi/` を開いて確認
+4. （任意）Settings → General → Default branch を `main` にする
+5. note の記事にこの URL を貼る。記事ごとに最後に `?from=記事の名前` を付ける（例：`…/amil_suhi/?from=note1`）と、どの記事から来た人かを計測できます
+
+- 公開されるのは `main` ブランチの内容です。修正は作業用のブランチで行い、プルリクエストで `main` に反映します（公開中のページが意図せず変わらないように）
+- `.nojekyll` は、GitHub Pages がページを余計に変換しないためのファイルです（消さないでください）
+
+### 独自ドメインに移るとき
+1. Cloudflare でドメインを買う（Cloudflare → Domain Registration）
+2. GitHub の **Settings → Pages → Custom domain** にドメインを入れて Save（リポジトリに `CNAME` ファイルができます）
+3. Cloudflare の DNS に、GitHub の案内どおりのレコード（`A` レコード4つ、または `www` の `CNAME`）を追加し、「Enforce HTTPS」をオンにする
+4. 移ったあとにやること
+   - note の記事のリンクを新しい URL に書き換える
+   - A/B の振り分けは URL ごとに記録されるため、移行すると振り分け直しになります。A/B テストの区切りで移るのがおすすめです
+   - GA4 のデータストリームの URL を新しいドメインに変える
 
 ## 設定（`index.html` の先頭の `CONFIG`）
 | 項目 | 内容 |

@@ -18,7 +18,6 @@
   --sky-3: #b9dd98;
   --sea-1: #9ccd7e;
   --sea-2: #86bf68;
-  --gold: #f3e3a0;       /* ヘッダーの文字 */
   --title: #2f5a2c;      /* ページタイトル */
   --text: #26371f;       /* 森の上の文字 */
   --text-muted: #4a5c40;
@@ -55,18 +54,6 @@ body {
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
 .inner { max-width: 1120px; margin: 0 auto; }
-
-/* ---------- header ---------- */
-.site-header { background: var(--night); padding-block: 18px; }
-.site-header .inner { display: flex; align-items: center; gap: 12px; }
-.site-name {
-  font-family: var(--f-title);
-  font-weight: 700;
-  color: var(--gold);
-  font-size: 17px;
-  letter-spacing: .04em;
-  margin: 0;
-}
 
 /* ---------- hero (昼の森。木や光は #forest キャンバスに描く) ---------- */
 .hero {
@@ -193,7 +180,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   box-shadow: 0 2px 8px rgba(0, 0, 0, .3);
 }
 .submit:hover { filter: brightness(1.15); }
-:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+:focus-visible { outline: 2px solid var(--title); outline-offset: 2px; }
 
 /* ---------- result (右) ---------- */
 .result-col { padding-left: 10px; display: grid; gap: 34px; min-width: 0; }
@@ -399,11 +386,6 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 </head>
 <body>
 
-<header class="site-header gutter">
-  <div class="inner">
-    <p class="site-name" data-shop>amil - 数秘自動計算 -</p>
-  </div>
-</header>
 
 <main class="hero gutter">
   <canvas id="forest" aria-hidden="true"></canvas>

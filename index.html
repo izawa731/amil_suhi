@@ -30,9 +30,8 @@
   --ink-muted: #4c5a86;
   --btn-1: #2f6b3a;
   --btn-2: #6a9a3a;
-  --past: #e0245e;
-  --present: #f1df3c;
-  --future: #f0a12f;
+  --frame-empty: #d3e2c6;
+  --rainbow: linear-gradient(90deg, #e53935, #f08a24, #e8c21a, #43a047, #3d7fd6, #8e5cc8);
   --cta-1: #a6e6e3;
   --cta-2: #f3d58f;
   --cta-strong: #c4621c;  /* 予約ボタン */
@@ -219,14 +218,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 }
 .core-head h2 small { font-size: .74em; }
 .core-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; width: 100%; }
-.core-box .n-num { border-bottom-width: 3px; }
-.core-box.past .n-num, .core-box.past.done .n-num { border-bottom-color: var(--past); }
-.core-box.present .n-num, .core-box.present.done .n-num { border-bottom-color: var(--present); }
-.core-box.future .n-num, .core-box.future.done .n-num { border-bottom-color: var(--future); }
-.core-box .n-text { border: 2px solid; min-height: 0; }
-.core-box.past .n-text { border-color: var(--past); }
-.core-box.present .n-text { border-color: var(--present); }
-.core-box.future .n-text { border-color: var(--future); }
+.core-box .n-text { min-height: 0; }
 
 /* Name / Birthday */
 .who { display: grid; gap: 14px; max-width: 360px; }
@@ -280,7 +272,14 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   font-size: 15px;
   font-variant-numeric: tabular-nums;
 }
-.n-box.done .n-num { border-bottom-color: var(--future); }
+/* 枠線は数ごとの色（NUM_COLORS）。鑑定前・計算できないときは薄い緑 */
+.n-box .n-text { border: 2px solid var(--frame-empty); }
+.n-box.done .n-num { border-bottom-color: var(--nc); }
+.n-box.done .n-text { border-color: var(--nc); }
+.n-box.done.rainbow .n-num, .n-box.done.rainbow .n-text {
+  border-color: transparent;
+  background: linear-gradient(var(--paper-solid), var(--paper-solid)) padding-box, var(--rainbow) border-box;
+}
 .n-name { font-size: 15px; font-weight: 700; letter-spacing: .04em; }
 .n-num .zoro { font-size: 12px; font-weight: 700; color: var(--ink-muted); margin-left: 1px; }
 .n-text {
@@ -361,20 +360,8 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 .save:hover { filter: brightness(1.15); }
 .img-hint { font-size: 12px !important; color: var(--text-muted) !important; }
 
-/* ---------- 注意書き・ボタン ---------- */
+/* ---------- ページ下のボタン ---------- */
 .after { position: relative; display: grid; gap: 34px; justify-items: center; padding-top: 30px; }
-.caution {
-  margin: 0;
-  max-width: 600px;
-  font-family: var(--f-title);
-  font-weight: 500;
-  font-size: 14.5px;
-  text-align: center;
-  color: var(--text);
-  background: rgba(255, 255, 255, .72);
-  border-radius: 12px;
-  padding: 10px 18px;
-}
 .cta-row { display: flex; flex-wrap: wrap; gap: 20px 64px; justify-content: center; }
 .cta {
   display: inline-grid;
@@ -426,7 +413,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       <path d="M22 7 L24.6 18.6 L36 22 L24.6 25.4 L22 37 L19.4 25.4 L8 22 L19.4 18.6 Z" fill="#e7c36a"/>
       <circle cx="33" cy="11" r="1.6" fill="#e7c36a"/><circle cx="10" cy="33" r="1.2" fill="#e7c36a"/>
     </svg>
-    <p class="site-name" data-shop>Numerology - 数秘自動計算 -</p>
+    <p class="site-name" data-shop>amil - 数秘自動計算 -</p>
   </div>
 </header>
 
@@ -495,14 +482,6 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
           <div class="n-box" data-k="M"><div class="n-tab"><div class="n-num">M</div><div class="n-head"><span class="n-name">将来のテーマ<small>M</small></span><span class="n-desc">性格と行動の数から。これから花ひらくこと</span></div></div><div class="n-text"></div></div>
         </div>
 
-        <!-- セッションへの案内（鑑定後に表示。文言は A/B で切り替え） -->
-        <section class="offer" id="offer" aria-labelledby="offer-h" hidden>
-          <h2 id="offer-h"></h2>
-          <p class="offer-lead" id="offer-lead"></p>
-          <ul class="offer-list" id="offer-list"></ul>
-          <a class="offer-btn" data-cta="result" href="#" target="_blank" rel="noopener">セッションを予約する</a>
-        </section>
-
         <section class="export" aria-labelledby="export-h">
           <h2 id="export-h">鑑定結果を画像で保存</h2>
           <p>あなたのイメージキャラクター（森の妖精）を真ん中に、すべての数とキーワードを1枚の画像（1080×1350）にまとめます。キャラクターは現在数で決まります。</p>
@@ -514,6 +493,14 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
             <p class="img-hint">スマホでは、画像を長押しして保存することもできます。</p>
             <a class="offer-btn small" data-cta="image" href="#" target="_blank" rel="noopener">この結果をセッションでくわしく聞く</a>
           </div>
+        </section>
+
+        <!-- セッションへの案内（鑑定後に表示。文言は A/B で切り替え） -->
+        <section class="offer" id="offer" aria-labelledby="offer-h" hidden>
+          <h2 id="offer-h"></h2>
+          <p class="offer-lead" id="offer-lead"></p>
+          <ul class="offer-list" id="offer-list"></ul>
+          <a class="offer-btn" data-cta="result" href="#" target="_blank" rel="noopener">セッションを予約する</a>
         </section>
 
       </div>
@@ -562,7 +549,6 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     </dialog>
 
     <div class="after">
-      <p class="caution">※他の数字との組み合わせによって読み解き方は変わります。くわしい鑑定をご希望の方は、鑑定士によるセッションをおすすめします。</p>
       <div class="cta-row">
         <a class="cta session" data-cta="bottom" href="#" target="_blank" rel="noopener">セッションを予約する</a>
       </div>
@@ -571,7 +557,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 </main>
 
 <footer class="site-footer gutter">
-  <div class="inner"><p>© 2026 <span data-shop>Numerology - 数秘自動計算 -</span></p></div>
+  <div class="inner"><p>© 2026 <span data-shop>amil - 数秘自動計算 -</span></p></div>
 </footer>
 
 <script>
@@ -585,7 +571,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     // セッションの予約ページの URL（STORES・BASE・coconala など）
     bookingUrl: "",
     // ヘッダー・フッターに出すお店の名前
-    shopName: "Numerology - 数秘自動計算 -",
+    shopName: "amil - 数秘自動計算 -",
     // 保存用の画像の一番下に入れる文字（空ならお店の名前）。例："note @your_account で無料鑑定"
     imageFooter: "",
     // Google アナリティクス（GA4）の測定 ID。例："G-XXXXXXXXXX"。空なら何も送信しません
@@ -808,6 +794,23 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     };
   }
 
+  /* ===== 数ごとの色（枠線に使う。ページと画像の両方） ===== */
+  var NUM_COLORS = {
+    1: "#e53935",   // 赤
+    2: "#f08a24",   // オレンジ
+    3: "#e8c21a",   // 黄
+    4: "#43a047",   // 緑
+    5: "#3d7fd6",   // 青
+    6: "#f48fb1",   // ピンク
+    7: "#8e5cc8",   // 紫
+    8: "#e0218a",   // マゼンタピンク
+    9: "#7d8a2e",   // オリーブ
+    11: "#a7adb7",  // シルバー
+    22: "#c9a227",  // ゴールド
+    33: "rainbow"   // レインボー
+  };
+  var RAINBOW = ["#e53935", "#f08a24", "#e8c21a", "#43a047", "#3d7fd6", "#8e5cc8"];
+
   /* ===== 表示 ===== */
   function setText(id, v) { document.getElementById(id).textContent = v; }
 
@@ -820,11 +823,13 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       var num = box.querySelector(".n-num"), txt = box.querySelector(".n-text");
       if (v === null) {
         num.textContent = "-";
-        box.classList.remove("done");
+        box.classList.remove("done", "rainbow");
         txt.innerHTML = '<span class="ph">' + (k === "S" ? "名前に母音（A・E・I・O・U）がないため計算できません。" : "名前に子音がないため計算できません。") + "</span>";
       } else {
         num.innerHTML = v + (r.zoro[k] ? '<span class="zoro">(' + r.zoro[k] + ')</span>' : "");
         box.classList.add("done");
+        box.classList.toggle("rainbow", NUM_COLORS[v] === "rainbow");
+        box.style.setProperty("--nc", NUM_COLORS[v] === "rainbow" ? "transparent" : NUM_COLORS[v]);
         txt.textContent = TEXTS[k][v];
       }
     });
@@ -857,7 +862,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   function showOffer(r) {
     // A：シンプルな案内　B：その人の数字を入れた案内
     if (VARIANT === "B") {
-      setText("offer-h", "あなたの「現在数 " + r.present + " × 未来数 " + r.future + "」を、くわしく読み解きます");
+      setText("offer-h", "あなたの数字をくわしく読み解きます");
       setText("offer-lead", "8つの数字は、組み合わせによって意味が変わります。セッションで、あなたの数字をひとつずつお伝えします。");
     } else {
       setText("offer-h", "より詳しい鑑定はセッションで");
@@ -876,7 +881,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   function fadeInResults() {
     var els = [document.getElementById("core"), document.querySelector(".who")]
       .concat([].slice.call(document.querySelectorAll("#chart .n-box")))
-      .concat([document.getElementById("offer"), document.querySelector(".export")]);
+      .concat([document.querySelector(".export"), document.getElementById("offer")]);
     els.forEach(function (el, i) {
       el.classList.remove("fade-in");
       void el.offsetWidth; // 動きを最初からやり直す
@@ -1266,7 +1271,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   var FONT_M = FONT_G; // 見出し用（同じ丸ゴシックを太字で使う）
   // 画像のカードの見出し（ページの見出しと同じ言葉）
   var LABELS = { P: "第一印象・見た目", LP: "性格・考え方", S: "心の願い・好き嫌い", M: "将来のテーマ", D: "行動・役割" };
-  var COLORS = { past: "#e0245e", present: "#e3c81e", future: "#f0a12f", num: "#2f5a2c", ink: "#26371f", muted: "#4a5c40" };
+  var COLORS = { num: "#2f5a2c", ink: "#26371f", muted: "#4a5c40" };
   var lastResult = null;
 
   function loadImg(src) {
@@ -1315,8 +1320,16 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     ctx.shadowColor = "rgba(30,60,30,.18)"; ctx.shadowBlur = 16; ctx.shadowOffsetY = 4;
     rrect(ctx, x, y, w, h, 22); ctx.fillStyle = "rgba(255,255,255,.93)"; ctx.fill();
     ctx.restore();
-    rrect(ctx, x, y, w, h, 22); ctx.lineWidth = border ? 5 : 2; ctx.strokeStyle = border || "#cfe3c0"; ctx.stroke();
+    var stroke = "#cfe3c0", lw = 2;
+    if (border === "rainbow") {
+      stroke = ctx.createLinearGradient(x, y, x + w, y + h);
+      RAINBOW.forEach(function (c, i) { stroke.addColorStop(i / (RAINBOW.length - 1), c); });
+      lw = 5;
+    } else if (border) { stroke = border; lw = 5; }
+    rrect(ctx, x, y, w, h, 22); ctx.lineWidth = lw; ctx.strokeStyle = stroke; ctx.stroke();
   }
+  // 数に対応した枠線の色（計算できないときは null ＝薄い緑）
+  function frameOf(v) { return v === null || v === undefined ? null : NUM_COLORS[v]; }
 
   function buildImage(r) {
     var fairy = FAIRIES[r.LP];
@@ -1347,10 +1360,10 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 
       // 過去数・現在数・未来数
       // 見出し・数字 → ひとこと（意味）→ 区切り線 → キーワード3つ
-      [["past", "過去数", COLORS.past], ["present", "現在数", COLORS.present], ["future", "未来数", COLORS.future]]
+      [["past", "過去数"], ["present", "現在数"], ["future", "未来数"]]
         .forEach(function (c, i) {
           var k = c[0], x = 60 + i * 330, y = 200, w = 300, h = 250;
-          card(ctx, x, y, w, h, c[2]);
+          card(ctx, x, y, w, h, frameOf(r[k]));
           ctx.textAlign = "left";
           ctx.fillStyle = COLORS.ink; ctx.font = "700 30px " + FONT_G; ctx.fillText(c[1], x + 22, y + 46);
           ctx.textAlign = "right"; ctx.fillStyle = COLORS.num; ctx.font = "700 64px " + FONT_G; ctx.fillText(r[k], x + w - 20, y + 66);
@@ -1398,7 +1411,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       // 周りの4つの数
       function sideCard(k, x, y) {
         var w = 290, h = 230, v = r[k];
-        card(ctx, x, y, w, h, null);
+        card(ctx, x, y, w, h, frameOf(v));
         drawLabel(k, x + 20, y + 40, w - 40);
         drawBadge(k, x + 20, y + 82);
         drawNum(v, r.zoro[k], x + w - 20, y + 100, 58, "right");
@@ -1413,7 +1426,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 
       // 行動・役割（D）は下の横長カード
       var dx = 190, dy = 996, dw = 700, dh = 178;
-      card(ctx, dx, dy, dw, dh, null);
+      card(ctx, dx, dy, dw, dh, frameOf(r.D));
       drawLabel("D", dx + 28, dy + 46, 170);
       drawBadge("D", dx + 28, dy + 84);
       drawNum(r.D, r.zoro.D, dx + 28, dy + 152, 66, "left");

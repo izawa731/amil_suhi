@@ -194,12 +194,6 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
 }
 .submit:hover { filter: brightness(1.15); }
 :focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.privacy {
-  margin: 0;
-  font-size: 11px;
-  line-height: 1.6;
-  color: var(--text-muted);
-}
 
 /* ---------- result (右) ---------- */
 .result-col { padding-left: 10px; display: grid; gap: 34px; min-width: 0; }
@@ -439,14 +433,12 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
             <label class="f-label romaji-label" for="name">ローマ字（自動で入ります）</label>
             <input type="text" id="name" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" placeholder="YAMADA TARO" maxlength="60">
             <div class="notes">
-              <p>※苗字と名前の間はスペースを空けてください。順番はどちらでもかまいません。</p>
               <p>※パスポートと同じ<button type="button" class="link-btn" data-guide>ヘボン式ローマ字</button>に変換します。パスポートと違うときは、ローマ字の欄を直してください。</p>
             </div>
           </div>
           <p class="error" id="error" role="alert" hidden></p>
           <button type="submit" class="submit">鑑定する</button>
         </form>
-        <p class="privacy" id="privacy">※入力された氏名と生年月日は、このページの中で数秘の計算にだけ使います。計算はお使いの端末の中で行われ、どこにも送信・保存されません。</p>
       </div>
 
       <!-- 右：結果 -->
@@ -865,11 +857,8 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
     document.getElementById("offer").hidden = false;
   }
 
-  // お店の名前・プライバシーの文言
+  // お店の名前
   document.querySelectorAll("[data-shop]").forEach(function (el) { el.textContent = CONFIG.shopName; });
-  if (CONFIG.gaId) {
-    setText("privacy", "※入力された名前と生年月日は、このページの中で数秘の計算にだけ使い、どこにも送信・保存しません。ページの利用状況（鑑定した回数など）だけを Google アナリティクスで計測しています。");
-  }
 
   /* ===== 鑑定結果を上から順にフェードイン ===== */
   function fadeInResults() {

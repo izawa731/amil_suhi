@@ -338,6 +338,19 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   padding: 8px 28px;
 }
 .save:hover { filter: brightness(1.15); }
+/* 保存したあとのメッセージ（数秒で消える） */
+.save-msg {
+  margin: 0;
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--title);
+  background: #e8f5dc;
+  border: 1px solid #b9dba0;
+  border-radius: 999px;
+  padding: 6px 16px;
+  transition: opacity .6s;
+}
+.save-msg.fading { opacity: 0; }
 .img-hint { font-size: 12px !important; color: var(--text-muted) !important; }
 
 /* ---------- ページ下のボタン ---------- */
@@ -458,6 +471,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
           <div class="img-out" id="img-out" hidden>
             <img id="img-preview" alt="鑑定結果の画像">
             <a class="save" id="img-save" href="#" download="numerology.png">画像を保存</a>
+            <p class="save-msg" id="save-msg" role="status" hidden></p>
             <p class="img-hint" id="img-hint">スマホでは、画像を長押しして保存することもできます。</p>
             <a class="offer-btn small" data-cta="image" href="#" target="_blank" rel="noopener">この結果をセッションでくわしく聞く</a>
           </div>
@@ -1424,15 +1438,35 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   }
 
   // スマホ（共有に対応した端末）は共有メニューを開く。そこで「画像を保存」を選ぶと写真アプリに入る
+  // 保存のあとにメッセージを出し、5秒後に消す
+  var saveMsg = document.getElementById("save-msg"), saveTimer = null;
+  function showSaved(text) {
+    clearTimeout(saveTimer);
+    saveMsg.textContent = text;
+    saveMsg.classList.remove("fading");
+    saveMsg.hidden = false;
+    saveTimer = setTimeout(function () {
+      saveMsg.classList.add("fading");
+      saveTimer = setTimeout(function () { saveMsg.hidden = true; }, 600);
+    }, 5000);
+  }
+  function download() {
+    var a = document.createElement("a");
+    a.href = imgSave.href; a.download = imgSave.download;
+    document.body.appendChild(a); a.click(); a.remove();
+    showSaved("✓ 画像を保存しました");
+  }
+
   imgSave.addEventListener("click", function (e) {
     track("save_image", { method: canShareFile(imgFile) ? "share" : "download" });
-    if (!canShareFile(imgFile)) return; // パソコンなどは今までどおりダウンロード
+    if (!canShareFile(imgFile)) { setTimeout(function () { showSaved("✓ 画像を保存しました"); }, 0); return; } // パソコンなどはダウンロード
     e.preventDefault();
-    navigator.share({ files: [imgFile] }).catch(function (err) {
+    navigator.share({ files: [imgFile] }).then(function () {
+      // 共有メニューで何かを選んだとき（どれを選んだかはページからはわからない）
+      showSaved("✓ 保存しました");
+    }).catch(function (err) {
       if (err && err.name === "AbortError") return; // メニューを閉じただけ
-      var a = document.createElement("a");          // うまく開けなかったときはダウンロード
-      a.href = imgSave.href; a.download = imgSave.download;
-      document.body.appendChild(a); a.click(); a.remove();
+      download();                                   // うまく開けなかったときはダウンロード
     });
   });
 
@@ -1444,6 +1478,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       imgSave.href = url;
       imgSave.download = "numerology_" + lastResult.name.replace(/ /g, "_") + ".png";
       imgFile = dataUrlToFile(url, imgSave.download);
+      saveMsg.hidden = true;
       document.getElementById("img-hint").textContent = canShareFile(imgFile)
         ? "「画像を保存」を押して、出てきたメニューの「画像を保存」を選ぶと写真に保存されます。画像を長押ししても保存できます。"
         : "スマホでは、画像を長押しして保存することもできます。";

@@ -458,7 +458,7 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
           <div class="img-out" id="img-out" hidden>
             <img id="img-preview" alt="鑑定結果の画像">
             <a class="save" id="img-save" href="#" download="numerology.png">画像を保存</a>
-            <p class="img-hint">スマホでは、画像を長押しして保存することもできます。</p>
+            <p class="img-hint" id="img-hint">スマホでは、画像を長押しして保存することもできます。</p>
             <a class="offer-btn small" data-cta="image" href="#" target="_blank" rel="noopener">この結果をセッションでくわしく聞く</a>
           </div>
         </section>
@@ -1411,6 +1411,31 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
   var imgPrev = document.getElementById("img-preview");
   var imgSave = document.getElementById("img-save");
   var imgMsg = document.getElementById("img-msg");
+  var imgFile = null; // 共有メニュー用に用意しておく PNG ファイル
+
+  // data URL → PNG の File（押した瞬間に共有メニューを開けるよう、先に作っておく）
+  function dataUrlToFile(url, name) {
+    var bin = atob(url.split(",")[1]), buf = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+    try { return new File([buf], name, { type: "image/png" }); } catch (e) { return null; }
+  }
+  function canShareFile(f) {
+    try { return !!(f && navigator.share && navigator.canShare && navigator.canShare({ files: [f] })); } catch (e) { return false; }
+  }
+
+  // スマホ（共有に対応した端末）は共有メニューを開く。そこで「画像を保存」を選ぶと写真アプリに入る
+  imgSave.addEventListener("click", function (e) {
+    track("save_image", { method: canShareFile(imgFile) ? "share" : "download" });
+    if (!canShareFile(imgFile)) return; // パソコンなどは今までどおりダウンロード
+    e.preventDefault();
+    navigator.share({ files: [imgFile] }).catch(function (err) {
+      if (err && err.name === "AbortError") return; // メニューを閉じただけ
+      var a = document.createElement("a");          // うまく開けなかったときはダウンロード
+      a.href = imgSave.href; a.download = imgSave.download;
+      document.body.appendChild(a); a.click(); a.remove();
+    });
+  });
+
   makeBtn.addEventListener("click", function () {
     if (!lastResult) return;
     makeBtn.disabled = true; imgMsg.textContent = "画像を作っています…";
@@ -1418,6 +1443,10 @@ input[type="text"]::placeholder { color: #666; letter-spacing: .02em; }
       imgPrev.src = url;
       imgSave.href = url;
       imgSave.download = "numerology_" + lastResult.name.replace(/ /g, "_") + ".png";
+      imgFile = dataUrlToFile(url, imgSave.download);
+      document.getElementById("img-hint").textContent = canShareFile(imgFile)
+        ? "「画像を保存」を押して、出てきたメニューの「画像を保存」を選ぶと写真に保存されます。画像を長押ししても保存できます。"
+        : "スマホでは、画像を長押しして保存することもできます。";
       imgOut.hidden = false;
       imgMsg.textContent = "";
       track("make_image");
